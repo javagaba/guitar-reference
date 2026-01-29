@@ -1,4 +1,5 @@
-import { createContext, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
+import { useSearchParams } from "react-router-dom";
 import { getScaleNotes, noteIndex, SCALE_DEFINITIONS } from "../music";
 
 interface AppState {
@@ -18,12 +19,63 @@ interface AppState {
 
 const AppContext = createContext<AppState | null>(null);
 
+function parseInitialState(searchParams: URLSearchParams) {
+  let key: string | null = null;
+  let scale = "Major";
+  let minor = false;
+
+  const keyParam = searchParams.get("key");
+  if (keyParam && noteIndex(keyParam) >= 0) {
+    key = keyParam;
+  }
+
+  const scaleParam = searchParams.get("scale");
+  if (scaleParam && SCALE_DEFINITIONS.some((s) => s.name === scaleParam)) {
+    scale = scaleParam;
+  }
+
+  if (searchParams.has("minor")) {
+    minor = true;
+  }
+
+  return { key, scale, minor };
+}
+
 export function AppProvider({ children }: { children: ReactNode }) {
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  const [isMinor, setIsMinor] = useState(false);
-  const [selectedScale, setSelectedScale] = useState("Major");
+  const [searchParams, setSearchParams] = useSearchParams();
+
+  const initial = useMemo(() => parseInitialState(searchParams), []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  const [selectedKey, setSelectedKey] = useState<string | null>(initial.key);
+  const [isMinor, setIsMinor] = useState(initial.minor);
+  const [selectedScale, setSelectedScale] = useState(initial.scale);
   const [selectedChord, setSelectedChord] = useState<string | null>(null);
   const [showIntervals, setShowIntervals] = useState(false);
+
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev);
+        if (selectedKey) {
+          next.set("key", selectedKey);
+        } else {
+          next.delete("key");
+        }
+        if (selectedScale !== "Major") {
+          next.set("scale", selectedScale);
+        } else {
+          next.delete("scale");
+        }
+        if (isMinor) {
+          next.set("minor", "1");
+        } else {
+          next.delete("minor");
+        }
+        return next;
+      },
+      { replace: true },
+    );
+  }, [selectedKey, selectedScale, isMinor, setSearchParams]);
 
   const scaleNotes = useMemo(() => {
     if (!selectedKey) return [];

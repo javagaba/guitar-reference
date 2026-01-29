@@ -188,7 +188,7 @@ export function CircleOfFifths() {
   }
 
   return (
-    <Card className="mx-auto mt-6 max-w-[580px]">
+    <Card>
       <SectionTitle>Circle of Fifths</SectionTitle>
       <div className="flex justify-center py-3">
         <svg viewBox="0 0 500 500" className="w-full max-w-[480px]">

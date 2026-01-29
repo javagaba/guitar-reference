@@ -1,45 +1,44 @@
-import { ChordDisplay } from "./components/ChordDisplay";
-import { ChordFormulas } from "./components/ChordFormulas";
-import { CircleOfFifths } from "./components/CircleOfFifths";
-import { Fretboard } from "./components/Fretboard";
-import { KeyChordsTable } from "./components/KeyChordsTable";
-import { Progressions } from "./components/Progressions";
+import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { ScaleSelector } from "./components/ScaleSelector";
 import { AppProvider } from "./context/AppContext";
-import { MAJOR_KEY_CHORDS, MINOR_KEY_CHORDS } from "./music";
+import { HomePage } from "./pages/HomePage";
+import { ReferencePage } from "./pages/ReferencePage";
+
+function navClass({ isActive }: { isActive: boolean }) {
+  return `text-xs px-2 py-1 rounded transition-colors ${
+    isActive
+      ? "text-text bg-card border border-border"
+      : "text-subtle hover:text-text"
+  }`;
+}
 
 export default function App() {
   return (
-    <AppProvider>
-      <div className="min-h-screen bg-bg px-4 pb-8 font-sans text-text sm:px-8">
-        <div className="sticky top-0 z-50 bg-bg border-b border-border/50 py-4 -mx-4 px-4 sm:-mx-8 sm:px-8">
-          <ScaleSelector />
-        </div>
-        <Fretboard />
-        <ChordDisplay />
+    <BrowserRouter>
+      <AppProvider>
+        <div className="min-h-screen bg-bg px-4 pb-8 font-sans text-text sm:px-8">
+          <div className="sticky top-0 z-50 bg-bg border-b border-border/50 py-4 -mx-4 px-4 sm:-mx-8 sm:px-8">
+            <ScaleSelector />
+            <nav className="mx-auto mt-2 flex max-w-[1200px] gap-2">
+              <NavLink to="/" end className={navClass}>
+                Home
+              </NavLink>
+              <NavLink to="/reference" className={navClass}>
+                Reference
+              </NavLink>
+            </nav>
+          </div>
 
-        <div className="mx-auto mt-6 grid max-w-300 grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
-          <ChordFormulas />
-          <KeyChordsTable
-            title="Major Key Chords"
-            numerals={["I", "ii", "iii", "IV", "V", "vi", "vii°"]}
-            rows={MAJOR_KEY_CHORDS}
-          />
-          <KeyChordsTable
-            title="Minor Key Chords"
-            numerals={["i", "ii°", "III", "iv", "v", "VI", "VII"]}
-            rows={MINOR_KEY_CHORDS}
-            isMinorTable
-          />
-          <Progressions />
-        </div>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/reference" element={<ReferencePage />} />
+          </Routes>
 
-        <CircleOfFifths />
-
-        <div className="mt-8 text-center text-[11px] text-[#444]">
-          Standard Tuning (EADGBE)
+          <div className="mt-8 text-center text-[11px] text-[#444]">
+            Standard Tuning (EADGBE)
+          </div>
         </div>
-      </div>
-    </AppProvider>
+      </AppProvider>
+    </BrowserRouter>
   );
 }

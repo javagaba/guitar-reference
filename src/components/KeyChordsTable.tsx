@@ -14,30 +14,26 @@ function RomanNumeral({ num }: { num: string }) {
   return <span className={className}>{num}</span>;
 }
 
-export function KeyChordsTable({
-  title,
-  numerals,
-  rows,
-  isMinorTable = false,
-}: {
-  title: string;
+interface TableSection {
+  subtitle: string;
   numerals: string[];
   rows: KeyChords[];
   isMinorTable?: boolean;
-}) {
+}
+
+function SectionTable({ section }: { section: TableSection }) {
   const { selectedKey, isMinor, selectedChord, selectKey, selectChord } =
     useAppContext();
 
   function isSelectedRow(row: KeyChords): boolean {
     if (!selectedKey) return false;
     const displayKey = isMinor ? selectedKey + "m" : selectedKey;
-    return row.key === displayKey && isMinor === isMinorTable;
+    return row.key === displayKey && isMinor === !!section.isMinorTable;
   }
 
   function handleRowClick(row: KeyChords) {
-    // Extract root from key label (strip trailing "m")
     const root = row.key.endsWith("m") ? row.key.slice(0, -1) : row.key;
-    selectKey(root, isMinorTable);
+    selectKey(root, !!section.isMinorTable);
   }
 
   function handleChordClick(chord: string, e: React.MouseEvent) {
@@ -46,16 +42,17 @@ export function KeyChordsTable({
   }
 
   return (
-    <Card>
-      <SectionTitle>{title}</SectionTitle>
-      <div className="overflow-x-auto">
+    <div>
+      <h3 className="mb-1 mt-3 text-[11px] font-semibold uppercase tracking-wider text-subtle first:mt-0">
+        {section.subtitle}
+      </h3>
       <table className="w-full border-collapse text-xs">
         <thead>
           <tr>
             <th className="p-2 text-center text-[11px] font-semibold text-subtle">
               Key
             </th>
-            {numerals.map((num, i) => (
+            {section.numerals.map((num, i) => (
               <th key={i} className="p-2 text-center text-[10px] font-semibold">
                 <RomanNumeral num={num} />
               </th>
@@ -63,7 +60,7 @@ export function KeyChordsTable({
           </tr>
         </thead>
         <tbody>
-          {rows.map((row, i) => {
+          {section.rows.map((row, i) => {
             const rowSelected = isSelectedRow(row);
             return (
               <tr
@@ -112,6 +109,24 @@ export function KeyChordsTable({
           })}
         </tbody>
       </table>
+    </div>
+  );
+}
+
+export function KeyChordsTable({
+  title,
+  sections,
+}: {
+  title: string;
+  sections: TableSection[];
+}) {
+  return (
+    <Card>
+      <SectionTitle>{title}</SectionTitle>
+      <div className="overflow-x-auto space-y-4">
+        {sections.map((section, i) => (
+          <SectionTable key={i} section={section} />
+        ))}
       </div>
     </Card>
   );

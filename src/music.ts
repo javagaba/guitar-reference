@@ -1,11 +1,13 @@
 import type {
   ChordFormula,
+  ChordQuality,
   KeyChords,
   KeySignature,
   NoteName,
   Progression,
   ProgressionGroup,
   ScaleDefinition,
+  ScaleTriad,
 } from "./types";
 
 // ── Foundational constants ──────────────────────────────────────────
@@ -145,14 +147,25 @@ export const NOTE_COLORS = buildNoteColors();
 export const CHORD_FORMULAS: ChordFormula[] = [
   { name: "Major", formula: "1, 3, 5" },
   { name: "Minor", formula: "1, ♭3, 5" },
-  { name: "Major 7", formula: "1, 3, 5, 7" },
-  { name: "Minor 7", formula: "1, ♭3, 5, ♭7" },
-  { name: "Dominant 7", formula: "1, 3, 5, ♭7" },
+  { name: "Power (5)", formula: "1, 5" },
   { name: "Sus2", formula: "1, 2, 5" },
   { name: "Sus4", formula: "1, 4, 5" },
-  { name: "Diminished", formula: "1, ♭3, ♭5" },
-  { name: "Augmented", formula: "1, 3, ♯5" },
+  { name: "Dominant 7", formula: "1, 3, 5, ♭7" },
+  { name: "Major 7", formula: "1, 3, 5, 7" },
+  { name: "Minor 7", formula: "1, ♭3, 5, ♭7" },
+  { name: "Minor/Major 7", formula: "1, ♭3, 5, 7" },
+  { name: "7sus4", formula: "1, 4, 5, ♭7" },
+  { name: "6", formula: "1, 3, 5, 6" },
+  { name: "Minor 6", formula: "1, ♭3, 5, 6" },
+  { name: "9", formula: "1, 3, 5, ♭7, 9" },
+  { name: "Major 9", formula: "1, 3, 5, 7, 9" },
+  { name: "Minor 9", formula: "1, ♭3, 5, ♭7, 9" },
   { name: "Add9", formula: "1, 3, 5, 9" },
+  { name: "Diminished", formula: "1, ♭3, ♭5" },
+  { name: "Diminished 7", formula: "1, ♭3, ♭5, 6" },
+  { name: "Half-Dim (m7♭5)", formula: "1, ♭3, ♭5, ♭7" },
+  { name: "Augmented", formula: "1, 3, ♯5" },
+  { name: "Aug 7", formula: "1, 3, ♯5, ♭7" },
 ];
 
 export const MAJOR_KEY_CHORDS = buildKeyChords(
@@ -371,6 +384,63 @@ export function getDiatonicChords(root: string, isMinor: boolean): string[] {
 
 export const MAJOR_NUMERALS = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
 export const MINOR_NUMERALS = ["i", "ii°", "III", "iv", "v", "VI", "VII"];
+
+// ── Scale triads ────────────────────────────────────────────────────
+
+const MAJOR_ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
+const MINOR_ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii"];
+
+function getTriadQuality(root: number, third: number, fifth: number): ChordQuality {
+  const thirdInterval = ((third - root) % 12 + 12) % 12;
+  const fifthInterval = ((fifth - root) % 12 + 12) % 12;
+  if (thirdInterval === 4 && fifthInterval === 8) return "augmented";
+  if (thirdInterval === 3 && fifthInterval === 6) return "diminished";
+  if (thirdInterval === 3 && fifthInterval === 7) return "minor";
+  return "major"; // 4+7
+}
+
+export function getScaleTriads(root: string, intervals: number[]): ScaleTriad[] | null {
+  if (intervals.length !== 7) return null;
+  const rootIdx = noteIndex(root);
+  const useFlats = FLAT_KEYS.has(root) || FLAT_KEYS.has(root + "m");
+
+  return intervals.map((_, i) => {
+    const rootSemitone = rootIdx + intervals[i];
+    const thirdSemitone = rootIdx + intervals[(i + 2) % 7] + (i + 2 >= 7 ? 12 : 0);
+    const fifthSemitone = rootIdx + intervals[(i + 4) % 7] + (i + 4 >= 7 ? 12 : 0);
+
+    const quality = getTriadQuality(rootSemitone, thirdSemitone, fifthSemitone);
+    const chordRoot = noteName(rootSemitone, useFlats);
+    const suffix = quality === "minor" ? "m" : quality === "diminished" ? "°" : quality === "augmented" ? "+" : "";
+    const chordName = chordRoot + suffix;
+
+    const roman = quality === "minor" || quality === "diminished"
+      ? MINOR_ROMAN[i]
+      : MAJOR_ROMAN[i];
+    const numeral = roman + (quality === "diminished" ? "°" : quality === "augmented" ? "+" : "");
+
+    return { degree: i + 1, root: chordRoot, quality, chordName, numeral };
+  });
+}
+
+// ── Chord formula resolver ──────────────────────────────────────────
+
+const INTERVAL_SEMITONES: Record<string, number> = {
+  "1": 0, "♭2": 1, "2": 2, "♭3": 3, "3": 4, "4": 5,
+  "♭5": 6, "5": 7, "♯5": 8, "6": 9, "♭7": 10, "7": 11,
+  "♭9": 13, "9": 14, "♯9": 15, "11": 17, "♯11": 18, "♭13": 20, "13": 21,
+};
+
+export function resolveChordFormula(root: string, formula: string): string[] {
+  const useFlats = FLAT_KEYS.has(root) || FLAT_KEYS.has(root + "m");
+  const rootIdx = noteIndex(root);
+  return formula.split(",").map((token) => {
+    const t = token.trim();
+    const semitones = INTERVAL_SEMITONES[t];
+    if (semitones === undefined) return t;
+    return noteName(rootIdx + semitones, useFlats);
+  });
+}
 
 export const SCALE_DEFINITIONS: ScaleDefinition[] = [
   // Diatonic

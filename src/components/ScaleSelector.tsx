@@ -1,6 +1,7 @@
+import { useMemo } from "react";
 import { playScale } from "../audio";
 import { useAppContext } from "../context/AppContext";
-import { SCALE_DEFINITIONS } from "../music";
+import { getNoteColor, getScaleTriads, SCALE_DEFINITIONS } from "../music";
 import { SectionTitle } from "./SectionTitle";
 
 const CHROMATIC_KEYS = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
@@ -8,7 +9,14 @@ const CHROMATIC_KEYS = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯",
 const categories = ["Diatonic", "Pentatonic", "Blues", "Mode", "Harmonic", "Melodic", "Exotic"] as const;
 
 export function ScaleSelector() {
-  const { selectedKey, selectedScale, scaleNotes, selectKey, selectScale, clearAll } = useAppContext();
+  const { selectedKey, selectedScale, selectedChord, scaleNotes, selectKey, selectScale, selectChord, clearAll } = useAppContext();
+
+  const def = SCALE_DEFINITIONS.find((s) => s.name === selectedScale);
+
+  const triads = useMemo(() => {
+    if (!selectedKey || !def) return null;
+    return getScaleTriads(selectedKey, def.intervals);
+  }, [selectedKey, def]);
 
   return (
     <div className="mx-auto max-w-[1200px]">
@@ -70,6 +78,27 @@ export function ScaleSelector() {
           </button>
         )}
 
+        {triads && (
+          <div className="flex items-center gap-1 border-l border-border pl-4">
+            {triads.map((t) => {
+              const isActive = selectedChord === t.chordName;
+              const color = getNoteColor(t.root);
+              return (
+                <button
+                  key={t.degree}
+                  onClick={() => selectChord(isActive ? null : t.chordName)}
+                  className="flex flex-col items-center rounded px-2 py-1 text-xs transition-colors hover:bg-card"
+                  style={isActive ? { boxShadow: `0 0 0 1.5px ${color}`, background: "var(--color-card)" } : undefined}
+                >
+                  <span className="text-[10px] text-subtle">{t.numeral}</span>
+                  <span className="font-mono font-medium" style={{ color }}>
+                    {t.chordName}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
+        )}
       </div>
     </div>
   );

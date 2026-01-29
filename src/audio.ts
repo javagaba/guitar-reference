@@ -89,12 +89,9 @@ export function playNote(stringIndex: number, fret: number): void {
   osc3.stop(t + DURATION);
 }
 
-function playFreq(freq: number): void {
-  const ac = getContext();
-  const t = ac.currentTime;
-
+function scheduleNote(ac: AudioContext, freq: number, t: number, gain = 0.5): void {
   const master = ac.createGain();
-  master.gain.setValueAtTime(0.5, t);
+  master.gain.setValueAtTime(gain, t);
   master.gain.exponentialRampToValueAtTime(0.001, t + DURATION);
   master.connect(ac.destination);
 
@@ -149,6 +146,11 @@ function playFreq(freq: number): void {
   osc3.stop(t + DURATION);
 }
 
+function playFreq(freq: number): void {
+  const ac = getContext();
+  scheduleNote(ac, freq, ac.currentTime);
+}
+
 function scaleToMidi(notes: string[]): number[] {
   const midis: number[] = [];
   let octave = 60;
@@ -163,6 +165,15 @@ function scaleToMidi(notes: string[]): number[] {
     midis.push(midi);
   }
   return midis;
+}
+
+export function playChord(notes: string[]): void {
+  const ac = getContext();
+  const midis = scaleToMidi(notes);
+  const t = ac.currentTime;
+  for (let i = 0; i < midis.length; i++) {
+    scheduleNote(ac, midiToFreq(midis[i]), t + i * 0.04, 0.35);
+  }
 }
 
 export async function playScale(notes: string[]): Promise<void> {

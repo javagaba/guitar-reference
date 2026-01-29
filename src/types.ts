@@ -35,6 +35,16 @@ export interface ScaleDefinition {
   intervals: number[];
 }
 
+export type ChordQuality = "major" | "minor" | "diminished" | "augmented";
+
+export interface ScaleTriad {
+  degree: number;
+  root: string;
+  quality: ChordQuality;
+  chordName: string;
+  numeral: string;
+}
+
 export interface ChordVoicing {
   name: string;
   frets: (number | -1)[]; // -1 = muted, 0 = open, 1+ = fret number (6 strings, low E to high E)

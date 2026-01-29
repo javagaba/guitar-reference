@@ -1,3 +1,4 @@
+import { playNote } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { FRET_MARKERS, FRETBOARD, getDegreeColor, getScaleDegree, isNoteInScale, noteIndex, STRING_LABELS } from "../music";
 import { Card } from "./Card";
@@ -92,6 +93,7 @@ export function Fretboard() {
                       label={label}
                       emphasis={emphasis}
                       colorOverride={showIntervals && degree != null ? getDegreeColor(degree) : undefined}
+                      onClick={() => playNote(stringIndex, fret)}
                     />
                   </div>
                 );

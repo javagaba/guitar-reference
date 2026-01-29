@@ -21,7 +21,7 @@ export function NoteCircle({ note, size = 24, dimmed = false, isRoot = false, la
       style={{ width: size, height: size }}
     >
       <div
-        className="flex items-center justify-center rounded-full font-mono font-semibold"
+        className="flex items-center justify-center rounded-full font-mono font-semibold active:scale-110"
         title={label ? note : undefined}
         style={{
           width: size,
@@ -35,8 +35,9 @@ export function NoteCircle({ note, size = 24, dimmed = false, isRoot = false, la
           color: isAccidental ? bgColor : "white",
           fontSize: size * 0.45,
           opacity: dimmed ? 0.15 : 1,
-          transition: "opacity 0.15s",
+          transition: "opacity 0.15s, transform 0.1s",
           cursor: onClick ? "pointer" : undefined,
+          userSelect: "none",
           boxShadow: [
             isRoot ? `0 0 8px ${bgColor}` : "",
             !dimmed && emphasis === "third" ? "inset 0 0 0 2px rgba(255,255,255,0.7)" : "",

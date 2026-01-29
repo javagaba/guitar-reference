@@ -110,7 +110,7 @@ export const MAJOR_KEY_CHORDS = buildKeyChords(
 );
 
 export const MINOR_KEY_CHORDS = buildKeyChords(
-  ["A", "B", "C", "D", "E", "F", "G"],
+  ["C", "D", "E", "F", "G", "A", "B"],
   MINOR_SCALE_INTERVALS,
   MINOR_CHORD_QUALITIES,
   true,

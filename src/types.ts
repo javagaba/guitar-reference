@@ -25,7 +25,7 @@ export interface KeySignature {
 
 export interface ScaleDefinition {
   name: string;
-  category: "Diatonic" | "Pentatonic" | "Blues" | "Mode";
+  category: "Diatonic" | "Pentatonic" | "Blues" | "Mode" | "Harmonic" | "Melodic" | "Exotic";
   intervals: number[];
 }
 

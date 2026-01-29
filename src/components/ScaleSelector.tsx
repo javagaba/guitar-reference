@@ -5,7 +5,7 @@ import { SectionTitle } from "./SectionTitle";
 
 const CHROMATIC_KEYS = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
 
-const categories = ["Diatonic", "Pentatonic", "Blues", "Mode"] as const;
+const categories = ["Diatonic", "Pentatonic", "Blues", "Mode", "Harmonic", "Melodic", "Exotic"] as const;
 
 export function ScaleSelector() {
   const { selectedKey, selectedScale, selectKey, selectScale, clearAll } = useAppContext();

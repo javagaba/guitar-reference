@@ -215,4 +215,22 @@ export const SCALE_DEFINITIONS: ScaleDefinition[] = [
   { name: "Mixolydian", category: "Mode", intervals: [0, 2, 4, 5, 7, 9, 10] },
   { name: "Aeolian", category: "Mode", intervals: [0, 2, 3, 5, 7, 8, 10] },
   { name: "Locrian", category: "Mode", intervals: [0, 1, 3, 5, 6, 8, 10] },
+  // Harmonic scales
+  { name: "Harmonic Minor", category: "Harmonic", intervals: [0, 2, 3, 5, 7, 8, 11] },
+  { name: "Harmonic Major", category: "Harmonic", intervals: [0, 2, 4, 5, 7, 8, 11] },
+  { name: "Double Harmonic", category: "Harmonic", intervals: [0, 1, 4, 5, 7, 8, 11] },
+  { name: "Phrygian Dominant", category: "Harmonic", intervals: [0, 1, 4, 5, 7, 8, 10] },
+  // Melodic scales
+  { name: "Melodic Minor", category: "Melodic", intervals: [0, 2, 3, 5, 7, 9, 11] },
+  { name: "Lydian Dominant", category: "Melodic", intervals: [0, 2, 4, 6, 7, 9, 10] },
+  { name: "Super Locrian", category: "Melodic", intervals: [0, 1, 3, 4, 6, 8, 10] },
+  { name: "Lydian Augmented", category: "Melodic", intervals: [0, 2, 4, 6, 8, 9, 11] },
+  // Exotic scales
+  { name: "Hungarian Minor", category: "Exotic", intervals: [0, 2, 3, 6, 7, 8, 11] },
+  { name: "Neapolitan Minor", category: "Exotic", intervals: [0, 1, 3, 5, 7, 8, 11] },
+  { name: "Neapolitan Major", category: "Exotic", intervals: [0, 1, 3, 5, 7, 9, 11] },
+  { name: "Enigmatic", category: "Exotic", intervals: [0, 1, 4, 6, 8, 10, 11] },
+  { name: "Whole Tone", category: "Exotic", intervals: [0, 2, 4, 6, 8, 10] },
+  { name: "Diminished HW", category: "Exotic", intervals: [0, 1, 3, 4, 6, 7, 9, 10] },
+  { name: "Diminished WH", category: "Exotic", intervals: [0, 2, 3, 5, 6, 8, 9, 11] },
 ];

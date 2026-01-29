@@ -11,7 +11,7 @@ export function Fretboard() {
         <div className="min-w-[800px]">
           {/* Fret numbers */}
           <div className="mb-2 flex pl-8">
-            {Array.from({ length: 13 }, (_, fret) => (
+            {FRETBOARD[0].map((_, fret) => (
               <div
                 key={fret}
                 className={`w-14 text-center font-mono text-[10px] ${
@@ -53,9 +53,9 @@ export function Fretboard() {
 
           {/* Fret dot markers */}
           <div className="mt-2 flex pl-8">
-            {Array.from({ length: 13 }, (_, fret) => (
+            {FRETBOARD[0].map((_, fret) => (
               <div key={fret} className="w-14 text-center text-subtle">
-                {fret === 12 ? "••" : FRET_MARKERS.includes(fret) ? "•" : ""}
+                {fret === 12 || fret === 24 ? "••" : FRET_MARKERS.includes(fret) ? "•" : ""}
               </div>
             ))}
           </div>

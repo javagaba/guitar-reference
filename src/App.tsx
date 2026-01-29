@@ -8,11 +8,11 @@ import { MAJOR_KEY_CHORDS, MINOR_KEY_CHORDS } from "./music";
 export default function App() {
   return (
     <div className="min-h-screen bg-bg p-8 font-sans text-text">
-      <div className="mb-8 text-center">
+      {/* <div className="mb-8 text-center">
         <h1 className="text-[28px] font-bold tracking-tight text-white">
           Guitar Reference
         </h1>
-      </div>
+      </div> */}
 
       <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
         <ChordFormulas />

@@ -118,7 +118,7 @@ export const MINOR_KEY_CHORDS = buildKeyChords(
 
 export const FRETBOARD = buildFretboard();
 export const STRING_LABELS = STANDARD_TUNING;
-export const FRET_MARKERS = [3, 5, 7, 9, 12];
+export const FRET_MARKERS = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
 
 export const PROGRESSIONS: ProgressionGroup[] = [
   {

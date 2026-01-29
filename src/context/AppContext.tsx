@@ -8,9 +8,11 @@ interface AppState {
   selectedChord: string | null;
   scaleNotes: string[];
   rootNote: string | null;
+  showIntervals: boolean;
   selectKey: (key: string | null, minor?: boolean) => void;
   selectScale: (scale: string) => void;
   selectChord: (chord: string | null) => void;
+  toggleIntervals: () => void;
   clearAll: () => void;
 }
 
@@ -21,6 +23,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [isMinor, setIsMinor] = useState(false);
   const [selectedScale, setSelectedScale] = useState("Major");
   const [selectedChord, setSelectedChord] = useState<string | null>(null);
+  const [showIntervals, setShowIntervals] = useState(false);
 
   const scaleNotes = useMemo(() => {
     if (!selectedKey) return [];
@@ -60,6 +63,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setSelectedChord(chord);
   }
 
+  function toggleIntervals() {
+    setShowIntervals((v) => !v);
+  }
+
   function clearAll() {
     setSelectedKey(null);
     setIsMinor(false);
@@ -75,12 +82,14 @@ export function AppProvider({ children }: { children: ReactNode }) {
       selectedChord,
       scaleNotes,
       rootNote,
+      showIntervals,
       selectKey,
       selectScale,
       selectChord,
+      toggleIntervals,
       clearAll,
     }),
-    [selectedKey, isMinor, selectedScale, selectedChord, scaleNotes],
+    [selectedKey, isMinor, selectedScale, selectedChord, scaleNotes, showIntervals],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

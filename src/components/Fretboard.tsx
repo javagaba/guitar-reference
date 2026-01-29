@@ -1,17 +1,27 @@
 import { useAppContext } from "../context/AppContext";
-import { FRET_MARKERS, FRETBOARD, isNoteInScale, noteIndex, STRING_LABELS } from "../music";
+import { FRET_MARKERS, FRETBOARD, getDegreeColor, getScaleDegree, isNoteInScale, noteIndex, STRING_LABELS } from "../music";
 import { Card } from "./Card";
 import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
 
 export function Fretboard() {
-  const { scaleNotes, rootNote } = useAppContext();
+  const { scaleNotes, rootNote, showIntervals, toggleIntervals } = useAppContext();
   const hasScale = scaleNotes.length > 0;
   const rootIdx = rootNote ? noteIndex(rootNote) : -1;
 
   return (
     <Card className="mx-auto mt-6 max-w-[1200px]">
-      <SectionTitle>Fretboard</SectionTitle>
+      <div className="flex items-center justify-between">
+        <SectionTitle>Fretboard</SectionTitle>
+        {hasScale && (
+          <button
+            onClick={toggleIntervals}
+            className="rounded-md bg-white/10 px-3 py-1 font-mono text-xs text-subtle transition-colors hover:bg-white/15"
+          >
+            {showIntervals ? "Intervals" : "Notes"}
+          </button>
+        )}
+      </div>
       <div className="overflow-x-auto py-4">
         <div className="min-w-[800px]">
           {/* Fret numbers */}
@@ -48,6 +58,18 @@ export function Fretboard() {
                 const isRoot = hasScale && noteIndex(note) === rootIdx;
                 const dimmed = hasScale && !inScale;
 
+                const degree = hasScale ? getScaleDegree(note, scaleNotes) : null;
+                const label = showIntervals && degree != null
+                  ? degree === 1 ? "R" : String(degree)
+                  : undefined;
+
+                let emphasis: "third" | "fifth" | null = null;
+                if (hasScale && inScale && rootIdx >= 0) {
+                  const semitones = ((noteIndex(note) - rootIdx) % 12 + 12) % 12;
+                  if (semitones === 3 || semitones === 4) emphasis = "third";
+                  else if (semitones === 7) emphasis = "fifth";
+                }
+
                 return (
                   <div
                     key={fret}
@@ -62,7 +84,15 @@ export function Fretboard() {
                         : "transparent",
                     }}
                   >
-                    <NoteCircle note={note} size={28} dimmed={dimmed} isRoot={isRoot} />
+                    <NoteCircle
+                      note={note}
+                      size={28}
+                      dimmed={dimmed}
+                      isRoot={isRoot}
+                      label={label}
+                      emphasis={emphasis}
+                      colorOverride={showIntervals && degree != null ? getDegreeColor(degree) : undefined}
+                    />
                   </div>
                 );
               })}

@@ -20,23 +20,29 @@ const CAGED_REFERENCE: { shape: CagedShape; color: string; lowFret: number; high
 
 const REFERENCE_ROOT = 9; // A
 
+const MAX_FRET = 21;
+
 export function getCagedBoxesForKey(root: string): CagedBox[] {
   const rootIdx = noteIndex(root);
   const offset = ((rootIdx - REFERENCE_ROOT) + 12) % 12;
+  const boxes: CagedBox[] = [];
 
-  return CAGED_REFERENCE.map((ref) => {
-    let low = ref.lowFret + offset;
-    let high = ref.highFret + offset;
-    // Keep within reasonable fret range (0-12)
-    if (low > 12) {
-      low -= 12;
-      high -= 12;
+  for (const ref of CAGED_REFERENCE) {
+    const baseLow = ref.lowFret + offset;
+    const baseHigh = ref.highFret + offset;
+    // Emit the box in every octave that overlaps 0..MAX_FRET
+    for (let oct = -12; oct <= 12; oct += 12) {
+      const low = baseLow + oct;
+      const high = baseHigh + oct;
+      if (high < 0 || low > MAX_FRET) continue;
+      boxes.push({
+        shape: ref.shape,
+        color: ref.color,
+        lowFret: Math.max(0, low),
+        highFret: Math.min(MAX_FRET, high),
+      });
     }
-    return {
-      shape: ref.shape,
-      color: ref.color,
-      lowFret: Math.max(0, low),
-      highFret: Math.min(12, high),
-    };
-  });
+  }
+
+  return boxes;
 }

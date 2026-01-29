@@ -5,7 +5,6 @@ import type {
   KeyChords,
   KeySignature,
   NoteName,
-  Progression,
   ProgressionGroup,
   ScaleDefinition,
   ScaleTriad,
@@ -44,7 +43,7 @@ const CHROMATIC_FLATS = [
 ];
 const STANDARD_TUNING = ["E", "B", "G", "D", "A", "E"]; // high to low
 const NATURAL_NOTES: NoteName[] = ["C", "D", "E", "F", "G", "A", "B"];
-const NUM_FRETS = 12;
+const NUM_FRETS = 21;
 
 const FLAT_KEYS = new Set([
   "F",
@@ -255,7 +254,13 @@ export const PROGRESSIONS: ProgressionGroup[] = [
 // ── Roman numeral resolver ─────────────────────────────────────────
 
 const ROMAN_MAP: Record<string, number> = {
-  I: 0, II: 1, III: 2, IV: 3, V: 4, VI: 5, VII: 6,
+  I: 0,
+  II: 1,
+  III: 2,
+  IV: 3,
+  V: 4,
+  VI: 5,
+  VII: 6,
 };
 
 export function resolveProgression(
@@ -270,7 +275,9 @@ export function resolveProgression(
 
   return chords.map((token) => {
     // Parse: optional accidental + roman numeral + suffix
-    const match = token.match(/^([♭♯]?)(III|II|IV|I|VII|VI|V|iii|ii|iv|i|vii|vi|v)(.*)$/);
+    const match = token.match(
+      /^([♭♯]?)(III|II|IV|I|VII|VI|V|iii|ii|iv|i|vii|vi|v)(.*)$/,
+    );
     if (!match) return token;
 
     const [, accidental, roman, suffix] = match;
@@ -279,7 +286,8 @@ export function resolveProgression(
     if (degree === undefined) return token;
 
     const isLowerCase = roman === roman.toLowerCase();
-    const accidentalOffset = accidental === "♭" ? -1 : accidental === "♯" ? 1 : 0;
+    const accidentalOffset =
+      accidental === "♭" ? -1 : accidental === "♯" ? 1 : 0;
     const semitone = rootIdx + intervals[degree] + accidentalOffset;
     const chordRoot = noteName(semitone, useFlats);
 
@@ -402,34 +410,53 @@ export const MINOR_NUMERALS = ["i", "ii°", "III", "iv", "v", "VI", "VII"];
 const MAJOR_ROMAN = ["I", "II", "III", "IV", "V", "VI", "VII"];
 const MINOR_ROMAN = ["i", "ii", "iii", "iv", "v", "vi", "vii"];
 
-function getTriadQuality(root: number, third: number, fifth: number): ChordQuality {
-  const thirdInterval = ((third - root) % 12 + 12) % 12;
-  const fifthInterval = ((fifth - root) % 12 + 12) % 12;
+function getTriadQuality(
+  root: number,
+  third: number,
+  fifth: number,
+): ChordQuality {
+  const thirdInterval = (((third - root) % 12) + 12) % 12;
+  const fifthInterval = (((fifth - root) % 12) + 12) % 12;
   if (thirdInterval === 4 && fifthInterval === 8) return "augmented";
   if (thirdInterval === 3 && fifthInterval === 6) return "diminished";
   if (thirdInterval === 3 && fifthInterval === 7) return "minor";
   return "major"; // 4+7
 }
 
-export function getScaleTriads(root: string, intervals: number[]): ScaleTriad[] | null {
+export function getScaleTriads(
+  root: string,
+  intervals: number[],
+): ScaleTriad[] | null {
   if (intervals.length !== 7) return null;
   const rootIdx = noteIndex(root);
   const useFlats = FLAT_KEYS.has(root) || FLAT_KEYS.has(root + "m");
 
   return intervals.map((_, i) => {
     const rootSemitone = rootIdx + intervals[i];
-    const thirdSemitone = rootIdx + intervals[(i + 2) % 7] + (i + 2 >= 7 ? 12 : 0);
-    const fifthSemitone = rootIdx + intervals[(i + 4) % 7] + (i + 4 >= 7 ? 12 : 0);
+    const thirdSemitone =
+      rootIdx + intervals[(i + 2) % 7] + (i + 2 >= 7 ? 12 : 0);
+    const fifthSemitone =
+      rootIdx + intervals[(i + 4) % 7] + (i + 4 >= 7 ? 12 : 0);
 
     const quality = getTriadQuality(rootSemitone, thirdSemitone, fifthSemitone);
     const chordRoot = noteName(rootSemitone, useFlats);
-    const suffix = quality === "minor" ? "m" : quality === "diminished" ? "°" : quality === "augmented" ? "+" : "";
+    const suffix =
+      quality === "minor"
+        ? "m"
+        : quality === "diminished"
+          ? "°"
+          : quality === "augmented"
+            ? "+"
+            : "";
     const chordName = chordRoot + suffix;
 
-    const roman = quality === "minor" || quality === "diminished"
-      ? MINOR_ROMAN[i]
-      : MAJOR_ROMAN[i];
-    const numeral = roman + (quality === "diminished" ? "°" : quality === "augmented" ? "+" : "");
+    const roman =
+      quality === "minor" || quality === "diminished"
+        ? MINOR_ROMAN[i]
+        : MAJOR_ROMAN[i];
+    const numeral =
+      roman +
+      (quality === "diminished" ? "°" : quality === "augmented" ? "+" : "");
 
     return { degree: i + 1, root: chordRoot, quality, chordName, numeral };
   });
@@ -438,9 +465,25 @@ export function getScaleTriads(root: string, intervals: number[]): ScaleTriad[] 
 // ── Chord formula resolver ──────────────────────────────────────────
 
 const INTERVAL_SEMITONES: Record<string, number> = {
-  "1": 0, "♭2": 1, "2": 2, "♭3": 3, "3": 4, "4": 5,
-  "♭5": 6, "5": 7, "♯5": 8, "6": 9, "♭7": 10, "7": 11,
-  "♭9": 13, "9": 14, "♯9": 15, "11": 17, "♯11": 18, "♭13": 20, "13": 21,
+  "1": 0,
+  "♭2": 1,
+  "2": 2,
+  "♭3": 3,
+  "3": 4,
+  "4": 5,
+  "♭5": 6,
+  "5": 7,
+  "♯5": 8,
+  "6": 9,
+  "♭7": 10,
+  "7": 11,
+  "♭9": 13,
+  "9": 14,
+  "♯9": 15,
+  "11": 17,
+  "♯11": 18,
+  "♭13": 20,
+  "13": 21,
 };
 
 export function resolveChordFormula(root: string, formula: string): string[] {
@@ -561,10 +604,15 @@ export const SCALE_DEFINITIONS: ScaleDefinition[] = [
 const MAJOR_SCALE_ROMAN_LABELS = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
 const MINOR_SCALE_ROMAN_LABELS = ["i", "ii°", "III", "iv", "v", "VI", "VII"];
 
-export function getSecondaryDominants(root: string, isMinor: boolean): SecondaryDominant[] {
+export function getSecondaryDominants(
+  root: string,
+  isMinor: boolean,
+): SecondaryDominant[] {
   const intervals = isMinor ? MINOR_SCALE_INTERVALS : MAJOR_SCALE_INTERVALS;
   const qualities = isMinor ? MINOR_CHORD_QUALITIES : MAJOR_CHORD_QUALITIES;
-  const romanLabels = isMinor ? MINOR_SCALE_ROMAN_LABELS : MAJOR_SCALE_ROMAN_LABELS;
+  const romanLabels = isMinor
+    ? MINOR_SCALE_ROMAN_LABELS
+    : MAJOR_SCALE_ROMAN_LABELS;
   const keyLabel = isMinor ? root + "m" : root;
   const useFlats = FLAT_KEYS.has(keyLabel);
   const rootIdx = noteIndex(root);
@@ -598,7 +646,10 @@ export function getSecondaryDominants(root: string, isMinor: boolean): Secondary
 
 // ── Borrowed Chords (Modal Interchange) ─────────────────────────────
 
-export function getBorrowedChords(root: string, isMinor: boolean): BorrowedChord[] {
+export function getBorrowedChords(
+  root: string,
+  isMinor: boolean,
+): BorrowedChord[] {
   const keyLabel = isMinor ? root + "m" : root;
   const useFlats = FLAT_KEYS.has(keyLabel);
   const rootIdx = noteIndex(root);
@@ -648,10 +699,10 @@ export function getBorrowedChords(root: string, isMinor: boolean): BorrowedChord
 
 export interface ChordInversion {
   inversionNumber: number;
-  label: string;        // "Root Position", "1st Inversion", etc.
+  label: string; // "Root Position", "1st Inversion", etc.
   slashNotation: string; // "C/E"
   bassNote: string;
-  notes: string[];       // reordered from bass
+  notes: string[]; // reordered from bass
 }
 
 export function getChordInversions(
@@ -663,7 +714,13 @@ export function getChordInversions(
 
   return formulaNotes.map((bassNote, i) => {
     const reordered = [...formulaNotes.slice(i), ...formulaNotes.slice(0, i)];
-    const labels = ["Root Position", "1st Inversion", "2nd Inversion", "3rd Inversion", "4th Inversion"];
+    const labels = [
+      "Root Position",
+      "1st Inversion",
+      "2nd Inversion",
+      "3rd Inversion",
+      "4th Inversion",
+    ];
     return {
       inversionNumber: i,
       label: labels[i] || `${i}th Inversion`,
@@ -674,7 +731,9 @@ export function getChordInversions(
   });
 }
 
-export function parseSlashChord(name: string): { chord: string; bass: string } | null {
+export function parseSlashChord(
+  name: string,
+): { chord: string; bass: string } | null {
   const idx = name.indexOf("/");
   if (idx < 0) return null;
   const chord = name.slice(0, idx);

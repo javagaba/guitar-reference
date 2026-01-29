@@ -25,7 +25,8 @@ export function KeyChordsTable({
   rows: KeyChords[];
   isMinorTable?: boolean;
 }) {
-  const { selectedKey, isMinor, selectedChord, selectKey, selectChord } = useAppContext();
+  const { selectedKey, isMinor, selectedChord, selectKey, selectChord } =
+    useAppContext();
 
   function isSelectedRow(row: KeyChords): boolean {
     if (!selectedKey) return false;
@@ -54,10 +55,7 @@ export function KeyChordsTable({
               Key
             </th>
             {numerals.map((num, i) => (
-              <th
-                key={i}
-                className="p-2 text-center text-[10px] font-semibold"
-              >
+              <th key={i} className="p-2 text-center text-[10px] font-semibold">
                 <RomanNumeral num={num} />
               </th>
             ))}
@@ -69,7 +67,7 @@ export function KeyChordsTable({
             return (
               <tr
                 key={i}
-                className="cursor-pointer transition-colors hover:bg-white/[0.04]"
+                className="cursor-pointer transition-colors hover:bg-white/4"
                 style={{
                   backgroundColor: rowSelected
                     ? "rgba(255,255,255,0.06)"
@@ -98,7 +96,9 @@ export function KeyChordsTable({
                           : undefined,
                         outlineOffset: "-2px",
                         borderRadius: isChordSelected ? "4px" : undefined,
-                        color: isChordSelected ? getNoteColor(chord) : undefined,
+                        color: isChordSelected
+                          ? getNoteColor(chord)
+                          : undefined,
                       }}
                       onClick={(e) => handleChordClick(chord, e)}
                     >

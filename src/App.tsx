@@ -16,7 +16,7 @@ export default function App() {
         <Fretboard />
         <ChordDisplay />
 
-        <div className="mx-auto mt-6 grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+        <div className="mx-auto mt-6 grid max-w-300 grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
           <ChordFormulas />
           <KeyChordsTable
             title="Major Key Chords"

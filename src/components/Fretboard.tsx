@@ -1,17 +1,26 @@
 import { playNote } from "../audio";
 import { useAppContext } from "../context/AppContext";
-import { FRET_MARKERS, FRETBOARD, getDegreeColor, getScaleDegree, isNoteInScale, noteIndex, STRING_LABELS } from "../music";
+import {
+  FRET_MARKERS,
+  FRETBOARD,
+  getDegreeColor,
+  getScaleDegree,
+  isNoteInScale,
+  noteIndex,
+  STRING_LABELS,
+} from "../music";
 import { Card } from "./Card";
 import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
 
 export function Fretboard() {
-  const { scaleNotes, rootNote, showIntervals, toggleIntervals } = useAppContext();
+  const { scaleNotes, rootNote, showIntervals, toggleIntervals } =
+    useAppContext();
   const hasScale = scaleNotes.length > 0;
   const rootIdx = rootNote ? noteIndex(rootNote) : -1;
 
   return (
-    <Card className="mx-auto mt-6 max-w-[1200px]">
+    <Card className="mx-auto mt-6 max-w-300">
       <div className="flex items-center justify-between">
         <SectionTitle>Fretboard</SectionTitle>
         {hasScale && (
@@ -24,7 +33,7 @@ export function Fretboard() {
         )}
       </div>
       <div className="overflow-x-auto py-4">
-        <div className="min-w-[800px]">
+        <div className="min-w-200">
           {/* Fret numbers */}
           <div className="mb-2 flex items-center">
             <div className="w-7 shrink-0" />
@@ -32,9 +41,7 @@ export function Fretboard() {
               <div
                 key={fret}
                 className={`w-14 text-center font-mono text-[10px] ${
-                  FRET_MARKERS.includes(fret)
-                    ? "text-subtle"
-                    : "text-[#555]"
+                  FRET_MARKERS.includes(fret) ? "text-subtle" : "text-[#555]"
                 }`}
                 style={{
                   borderLeft:
@@ -59,14 +66,20 @@ export function Fretboard() {
                 const isRoot = hasScale && noteIndex(note) === rootIdx;
                 const dimmed = hasScale && !inScale;
 
-                const degree = hasScale ? getScaleDegree(note, scaleNotes) : null;
-                const label = showIntervals && degree != null
-                  ? degree === 1 ? "R" : String(degree)
-                  : undefined;
+                const degree = hasScale
+                  ? getScaleDegree(note, scaleNotes)
+                  : null;
+                const label =
+                  showIntervals && degree != null
+                    ? degree === 1
+                      ? "R"
+                      : String(degree)
+                    : undefined;
 
                 let emphasis: "third" | "fifth" | null = null;
                 if (hasScale && inScale && rootIdx >= 0) {
-                  const semitones = ((noteIndex(note) - rootIdx) % 12 + 12) % 12;
+                  const semitones =
+                    (((noteIndex(note) - rootIdx) % 12) + 12) % 12;
                   if (semitones === 3 || semitones === 4) emphasis = "third";
                   else if (semitones === 7) emphasis = "fifth";
                 }
@@ -77,9 +90,7 @@ export function Fretboard() {
                     className="flex w-14 justify-center py-1"
                     style={{
                       borderLeft:
-                        fret === 0
-                          ? "3px solid #555"
-                          : "1px solid #333",
+                        fret === 0 ? "3px solid #555" : "1px solid #333",
                       backgroundColor: FRET_MARKERS.includes(fret)
                         ? "rgba(255,255,255,0.02)"
                         : "transparent",
@@ -92,7 +103,11 @@ export function Fretboard() {
                       isRoot={isRoot}
                       label={label}
                       emphasis={emphasis}
-                      colorOverride={showIntervals && degree != null ? getDegreeColor(degree) : undefined}
+                      colorOverride={
+                        showIntervals && degree != null
+                          ? getDegreeColor(degree)
+                          : undefined
+                      }
                       onClick={() => playNote(stringIndex, fret)}
                     />
                   </div>
@@ -115,7 +130,11 @@ export function Fretboard() {
                       : "1px solid transparent",
                 }}
               >
-                {fret === 12 || fret === 24 ? "••" : FRET_MARKERS.includes(fret) ? "•" : ""}
+                {fret === 12 || fret === 24
+                  ? "••"
+                  : FRET_MARKERS.includes(fret)
+                    ? "•"
+                    : ""}
               </div>
             ))}
           </div>

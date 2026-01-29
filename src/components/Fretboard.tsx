@@ -10,7 +10,8 @@ export function Fretboard() {
       <div className="overflow-x-auto py-4">
         <div className="min-w-[800px]">
           {/* Fret numbers */}
-          <div className="mb-2 flex pl-8">
+          <div className="mb-2 flex items-center">
+            <div className="w-7 shrink-0" />
             {FRETBOARD[0].map((_, fret) => (
               <div
                 key={fret}
@@ -19,6 +20,12 @@ export function Fretboard() {
                     ? "text-subtle"
                     : "text-[#555]"
                 }`}
+                style={{
+                  borderLeft:
+                    fret === 0
+                      ? "3px solid transparent"
+                      : "1px solid transparent",
+                }}
               >
                 {fret === 0 ? "Open" : fret}
               </div>
@@ -52,9 +59,19 @@ export function Fretboard() {
           ))}
 
           {/* Fret dot markers */}
-          <div className="mt-2 flex pl-8">
+          <div className="mt-2 flex items-center">
+            <div className="w-7 shrink-0" />
             {FRETBOARD[0].map((_, fret) => (
-              <div key={fret} className="w-14 text-center text-subtle">
+              <div
+                key={fret}
+                className="w-14 text-center text-subtle"
+                style={{
+                  borderLeft:
+                    fret === 0
+                      ? "3px solid transparent"
+                      : "1px solid transparent",
+                }}
+              >
                 {fret === 12 || fret === 24 ? "••" : FRET_MARKERS.includes(fret) ? "•" : ""}
               </div>
             ))}

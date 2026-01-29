@@ -1,9 +1,14 @@
-import { FRET_MARKERS, FRETBOARD, STRING_LABELS } from "../music";
+import { useAppContext } from "../context/AppContext";
+import { FRET_MARKERS, FRETBOARD, isNoteInScale, noteIndex, STRING_LABELS } from "../music";
 import { Card } from "./Card";
 import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
 
 export function Fretboard() {
+  const { scaleNotes, rootNote } = useAppContext();
+  const hasScale = scaleNotes.length > 0;
+  const rootIdx = rootNote ? noteIndex(rootNote) : -1;
+
   return (
     <Card className="mx-auto mt-6 max-w-[1200px]">
       <SectionTitle>Fretboard</SectionTitle>
@@ -38,23 +43,29 @@ export function Fretboard() {
               <div className="w-7 font-mono text-[11px] font-semibold text-muted">
                 {STRING_LABELS[stringIndex]}
               </div>
-              {string.map((note, fret) => (
-                <div
-                  key={fret}
-                  className="flex w-14 justify-center py-1"
-                  style={{
-                    borderLeft:
-                      fret === 0
-                        ? "3px solid #555"
-                        : "1px solid #333",
-                    backgroundColor: FRET_MARKERS.includes(fret)
-                      ? "rgba(255,255,255,0.02)"
-                      : "transparent",
-                  }}
-                >
-                  <NoteCircle note={note} size={28} />
-                </div>
-              ))}
+              {string.map((note, fret) => {
+                const inScale = hasScale && isNoteInScale(note, scaleNotes);
+                const isRoot = hasScale && noteIndex(note) === rootIdx;
+                const dimmed = hasScale && !inScale;
+
+                return (
+                  <div
+                    key={fret}
+                    className="flex w-14 justify-center py-1"
+                    style={{
+                      borderLeft:
+                        fret === 0
+                          ? "3px solid #555"
+                          : "1px solid #333",
+                      backgroundColor: FRET_MARKERS.includes(fret)
+                        ? "rgba(255,255,255,0.02)"
+                        : "transparent",
+                    }}
+                  >
+                    <NoteCircle note={note} size={28} dimmed={dimmed} isRoot={isRoot} />
+                  </div>
+                );
+              })}
             </div>
           ))}
 

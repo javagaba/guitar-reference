@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useAppContext } from "../context/AppContext";
 import {
   CIRCLE_MAJOR,
   CIRCLE_MINOR,
@@ -42,8 +42,7 @@ function accidentalLabel(key: string): string {
 }
 
 export function CircleOfFifths() {
-  const [selectedKey, setSelectedKey] = useState<string | null>(null);
-  const [isMinor, setIsMinor] = useState(false);
+  const { selectedKey, isMinor, selectedChord, selectKey, selectChord } = useAppContext();
 
   // Derive relationship data for the selected key
   const selectedMajorIdx = selectedKey
@@ -63,21 +62,17 @@ export function CircleOfFifths() {
   function isRelated(circleIdx: number, isMajorRing: boolean): boolean {
     if (selectedMajorIdx < 0) return false;
     if (isMajorRing) {
-      // Same position, or neighbors on the circle
       const diff = Math.abs(circleIdx - selectedMajorIdx);
       return diff <= 1 || diff === 11;
     }
-    // Minor ring: relative minor of selected major, or at neighbor positions
     const diff = Math.abs(circleIdx - selectedMajorIdx);
     return diff === 0 || diff <= 1 || diff === 11;
   }
 
   function getOpacity(circleIdx: number, isMajorRing: boolean): number {
     if (selectedKey === null) return 1;
-    // The selected key itself
     if (isMajorRing && !isMinor && CIRCLE_MAJOR[circleIdx] === selectedKey) return 1;
     if (!isMajorRing && isMinor && CIRCLE_MINOR[circleIdx] === selectedKey + "m") return 1;
-    // Relative key
     if (isMajorRing && isMinor && CIRCLE_MAJOR[circleIdx] === getRelativeMajor(selectedKey))
       return 1;
     if (!isMajorRing && !isMinor && CIRCLE_MINOR[circleIdx] === getRelativeMinor(selectedKey))
@@ -88,30 +83,26 @@ export function CircleOfFifths() {
 
   function handleMajorClick(key: string) {
     if (selectedKey === key && !isMinor) {
-      setSelectedKey(null);
+      selectKey(null);
     } else {
-      setSelectedKey(key);
-      setIsMinor(false);
+      selectKey(key, false);
     }
   }
 
   function handleMinorClick(minorLabel: string) {
     const root = minorLabel.replace("m", "");
     if (selectedKey === root && isMinor) {
-      setSelectedKey(null);
+      selectKey(null);
     } else {
-      setSelectedKey(root);
-      setIsMinor(true);
+      selectKey(root, true);
     }
   }
 
   function navigateTo(keyLabel: string) {
     if (keyLabel.endsWith("m")) {
-      setSelectedKey(keyLabel.replace("m", ""));
-      setIsMinor(true);
+      selectKey(keyLabel.replace("m", ""), true);
     } else {
-      setSelectedKey(keyLabel);
-      setIsMinor(false);
+      selectKey(keyLabel, false);
     }
   }
 
@@ -123,7 +114,6 @@ export function CircleOfFifths() {
       ? pos(selectedMajorIdx, INNER_R)
       : pos(selectedMajorIdx, OUTER_R);
 
-    // Line to relative key
     const relPos = isMinor
       ? pos(selectedMajorIdx, OUTER_R)
       : pos(selectedMajorIdx, INNER_R);
@@ -140,7 +130,6 @@ export function CircleOfFifths() {
       />,
     );
 
-    // Lines to circle neighbors
     const prevIdx = (selectedMajorIdx - 1 + 12) % 12;
     const nextIdx = (selectedMajorIdx + 1) % 12;
     const ring = isMinor ? INNER_R : OUTER_R;
@@ -178,7 +167,6 @@ export function CircleOfFifths() {
       : ks.relativeMinor
     : null;
 
-  // Neighbor keys on the circle
   const neighborKeys =
     selectedMajorIdx >= 0
       ? [
@@ -191,11 +179,9 @@ export function CircleOfFifths() {
         ]
       : [];
 
-  // Accidental summary for the detail panel
   function accidentalSummary(): string {
     if (!ks) return "";
-    // For minor keys, derive from relative major
-    const sig = isMinor ? ks : ks;
+    const sig = ks;
     if (sig.accidentals.length === 0) return "No sharps or flats";
     const symbol = sig.type === "sharp" ? "♯" : "♭";
     return `${sig.accidentals.length}${symbol}: ${sig.accidentals.join(" ")}`;
@@ -206,7 +192,7 @@ export function CircleOfFifths() {
       <SectionTitle>Circle of Fifths</SectionTitle>
       <div className="flex justify-center py-3">
         <svg viewBox="0 0 500 500" width="480" height="480">
-          {/* Arc text labels — right side (5ths) and left side (4ths) */}
+          {/* Arc text labels */}
           <defs>
             <path
               id="arc-right"
@@ -228,7 +214,6 @@ export function CircleOfFifths() {
             </textPath>
           </text>
 
-          {/* Relationship lines (behind circles) */}
           {renderRelationshipLines()}
 
           {/* Outer ring — major keys */}
@@ -398,20 +383,29 @@ export function CircleOfFifths() {
               Diatonic Chords
             </div>
             <div className="flex gap-2">
-              {chords.map((chord, i) => (
-                <div key={i} className="flex flex-col items-center gap-0.5">
-                  <span className="text-[9px] text-subtle">{numerals[i]}</span>
-                  <div
-                    className="flex h-7 items-center justify-center rounded px-1.5 font-mono text-[11px] font-semibold"
-                    style={{
-                      backgroundColor: getNoteColor(chord) + "22",
-                      color: getNoteColor(chord),
-                    }}
-                  >
-                    {chord}
+              {chords.map((chord, i) => {
+                const isChordSelected = selectedChord === chord;
+                return (
+                  <div key={i} className="flex flex-col items-center gap-0.5">
+                    <span className="text-[9px] text-subtle">{numerals[i]}</span>
+                    <div
+                      className="flex h-7 items-center justify-center rounded px-1.5 font-mono text-[11px] font-semibold"
+                      style={{
+                        backgroundColor: getNoteColor(chord) + "22",
+                        color: getNoteColor(chord),
+                        cursor: "pointer",
+                        outline: isChordSelected
+                          ? `2px solid ${getNoteColor(chord)}`
+                          : "none",
+                        outlineOffset: "1px",
+                      }}
+                      onClick={() => selectChord(isChordSelected ? null : chord)}
+                    >
+                      {chord}
+                    </div>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           </div>
 

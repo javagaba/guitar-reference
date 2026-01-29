@@ -1,4 +1,4 @@
-import type { ChordFormula, KeyChords, KeySignature, NoteName, ProgressionGroup } from "./types";
+import type { ChordFormula, KeyChords, KeySignature, NoteName, ProgressionGroup, ScaleDefinition } from "./types";
 
 // ── Foundational constants ──────────────────────────────────────────
 
@@ -18,10 +18,15 @@ const MINOR_CHORD_QUALITIES = ["m", "°", "", "m", "m", "", ""];
 
 // ── Helper functions ────────────────────────────────────────────────
 
-function noteIndex(note: string): number {
+export function noteIndex(note: string): number {
   const i = CHROMATIC_NOTES.indexOf(note);
   if (i >= 0) return i;
   return CHROMATIC_FLATS.indexOf(note);
+}
+
+export function isNoteInScale(note: string, scaleNotes: string[]): boolean {
+  const idx = noteIndex(note);
+  return scaleNotes.some((sn) => noteIndex(sn) === idx);
 }
 
 function noteName(semitone: number, useFlats: boolean): string {
@@ -191,3 +196,23 @@ export function getDiatonicChords(root: string, isMinor: boolean): string[] {
 
 export const MAJOR_NUMERALS = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
 export const MINOR_NUMERALS = ["i", "ii°", "III", "iv", "v", "VI", "VII"];
+
+export const SCALE_DEFINITIONS: ScaleDefinition[] = [
+  // Diatonic
+  { name: "Major", category: "Diatonic", intervals: [0, 2, 4, 5, 7, 9, 11] },
+  { name: "Natural Minor", category: "Diatonic", intervals: [0, 2, 3, 5, 7, 8, 10] },
+  // Pentatonic
+  { name: "Pentatonic Major", category: "Pentatonic", intervals: [0, 2, 4, 7, 9] },
+  { name: "Pentatonic Minor", category: "Pentatonic", intervals: [0, 3, 5, 7, 10] },
+  // Blues
+  { name: "Blues Major", category: "Blues", intervals: [0, 2, 3, 4, 7, 9] },
+  { name: "Blues Minor", category: "Blues", intervals: [0, 3, 5, 6, 7, 10] },
+  // Modes
+  { name: "Ionian", category: "Mode", intervals: [0, 2, 4, 5, 7, 9, 11] },
+  { name: "Dorian", category: "Mode", intervals: [0, 2, 3, 5, 7, 9, 10] },
+  { name: "Phrygian", category: "Mode", intervals: [0, 1, 3, 5, 7, 8, 10] },
+  { name: "Lydian", category: "Mode", intervals: [0, 2, 4, 6, 7, 9, 11] },
+  { name: "Mixolydian", category: "Mode", intervals: [0, 2, 4, 5, 7, 9, 10] },
+  { name: "Aeolian", category: "Mode", intervals: [0, 2, 3, 5, 7, 8, 10] },
+  { name: "Locrian", category: "Mode", intervals: [0, 1, 3, 5, 6, 8, 10] },
+];

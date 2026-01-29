@@ -1,0 +1,28 @@
+@import url("https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500;600&display=swap");
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", -apple-system, sans-serif;
+  --font-mono: "JetBrains Mono", monospace;
+
+  --color-bg: #1a1a1a;
+  --color-card: #242424;
+  --color-border: #333;
+  --color-muted: #666;
+  --color-subtle: #888;
+  --color-text: #e8e8e8;
+  --color-text-dim: #bbb;
+  --color-text-dimmer: #aaa;
+
+  --color-note-c: #e74c3c;
+  --color-note-d: #f39c12;
+  --color-note-e: #27ae60;
+  --color-note-f: #3498db;
+  --color-note-g: #9b59b6;
+  --color-note-a: #1abc9c;
+  --color-note-b: #e91e63;
+
+  --color-major: #3498db;
+  --color-minor: #9b59b6;
+  --color-dim: #e74c3c;
+}

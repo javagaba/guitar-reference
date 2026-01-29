@@ -14,15 +14,21 @@
   --color-text-dim: #bbb;
   --color-text-dimmer: #aaa;
 
-  --color-note-c: #ff6b6b;
-  --color-note-d: #ffa94d;
-  --color-note-e: #69db7c;
-  --color-note-f: #74c0fc;
-  --color-note-g: #b197fc;
-  --color-note-a: #63e6be;
-  --color-note-b: #f783ac;
-
   --color-major: #3498db;
   --color-minor: #9b59b6;
   --color-dim: #e74c3c;
+}
+
+/* Note colors are consumed via inline styles (getNoteColor), not Tailwind
+   utilities, so they must live outside @theme to avoid tree-shaking. */
+@layer base {
+  :root {
+    --color-note-c: #ff6b6b;
+    --color-note-d: #ffa94d;
+    --color-note-e: #69db7c;
+    --color-note-f: #74c0fc;
+    --color-note-g: #b197fc;
+    --color-note-a: #63e6be;
+    --color-note-b: #f783ac;
+  }
 }

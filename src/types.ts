@@ -10,10 +10,16 @@ export interface KeyChords {
   chords: string[];
 }
 
+export interface Progression {
+  name?: string;
+  chords: string[];
+}
+
 export interface ProgressionGroup {
   type: string;
   colorClass: string;
-  progressions: string[][];
+  isMinor: boolean;
+  progressions: Progression[];
 }
 
 export interface KeySignature {

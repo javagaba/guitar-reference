@@ -3,6 +3,7 @@ import type {
   KeyChords,
   KeySignature,
   NoteName,
+  Progression,
   ProgressionGroup,
   ScaleDefinition,
 } from "./types";
@@ -174,28 +175,100 @@ export const FRET_MARKERS = [3, 5, 7, 9, 12, 15, 17, 19, 21, 24];
 
 export const PROGRESSIONS: ProgressionGroup[] = [
   {
-    type: "Major",
+    type: "Pop / Rock",
     colorClass: "text-major",
+    isMinor: false,
     progressions: [
-      ["I", "IV", "V"],
-      ["I", "V", "vi", "IV"],
-      ["I", "vi", "IV", "V"],
-      ["ii", "V", "I"],
-      ["I", "IV", "I", "V"],
+      { chords: ["I", "IV", "V"] },
+      { name: "Pop Anthem", chords: ["I", "V", "vi", "IV"] },
+      { name: "'50s", chords: ["I", "vi", "IV", "V"] },
+      { name: "Axis", chords: ["vi", "IV", "I", "V"] },
+      { chords: ["I", "IV", "vi", "V"] },
+      { name: "Mixolydian Vamp", chords: ["I", "♭VII", "IV", "I"] },
+    ],
+  },
+  {
+    type: "Jazz",
+    colorClass: "text-major",
+    isMinor: false,
+    progressions: [
+      { name: "ii-V-I", chords: ["iim7", "V7", "Imaj7"] },
+      { name: "Turnaround", chords: ["Imaj7", "vim7", "iim7", "V7"] },
+      { name: "iii-vi-ii-V", chords: ["iiim7", "vim7", "iim7", "V7"] },
+      {
+        name: "Rhythm Changes A",
+        chords: ["Imaj7", "vim7", "iim7", "V7", "iiim7", "vim7", "iim7", "V7"],
+      },
+      { name: "ii-V to IV", chords: ["iim7", "V7", "Imaj7", "IVmaj7"] },
     ],
   },
   {
     type: "Minor",
     colorClass: "text-minor",
+    isMinor: true,
     progressions: [
-      ["i", "iv", "VII"],
-      ["i", "VI", "III", "VII"],
-      ["i", "iv", "v"],
-      ["i", "VII", "VI", "VII"],
-      ["i", "ii°", "V", "i"],
+      { chords: ["i", "iv", "VII"] },
+      { name: "Andalusian", chords: ["i", "VI", "III", "VII"] },
+      { chords: ["i", "iv", "v"] },
+      { chords: ["i", "VII", "VI", "VII"] },
+      { chords: ["i", "ii°", "V", "i"] },
+    ],
+  },
+  {
+    type: "Minor Jazz",
+    colorClass: "text-minor",
+    isMinor: true,
+    progressions: [
+      { name: "Minor ii-V-i", chords: ["iim7♭5", "V7", "im7"] },
+      { chords: ["im7", "ivm7", "V7", "im7"] },
+      { chords: ["im7", "♭VImaj7", "iim7♭5", "V7"] },
+      { chords: ["im7", "ivm7", "♭VImaj7", "V7"] },
     ],
   },
 ];
+
+// ── Roman numeral resolver ─────────────────────────────────────────
+
+const ROMAN_MAP: Record<string, number> = {
+  I: 0, II: 1, III: 2, IV: 3, V: 4, VI: 5, VII: 6,
+};
+
+export function resolveProgression(
+  chords: string[],
+  root: string,
+  isMinor: boolean,
+): string[] {
+  const intervals = isMinor ? MINOR_SCALE_INTERVALS : MAJOR_SCALE_INTERVALS;
+  const keyLabel = isMinor ? root + "m" : root;
+  const useFlats = FLAT_KEYS.has(keyLabel);
+  const rootIdx = noteIndex(root);
+
+  return chords.map((token) => {
+    // Parse: optional accidental + roman numeral + suffix
+    const match = token.match(/^([♭♯]?)(III|II|IV|I|VII|VI|V|iii|ii|iv|i|vii|vi|v)(.*)$/);
+    if (!match) return token;
+
+    const [, accidental, roman, suffix] = match;
+    const upperRoman = roman.toUpperCase();
+    const degree = ROMAN_MAP[upperRoman];
+    if (degree === undefined) return token;
+
+    const isLowerCase = roman === roman.toLowerCase();
+    const accidentalOffset = accidental === "♭" ? -1 : accidental === "♯" ? 1 : 0;
+    const semitone = rootIdx + intervals[degree] + accidentalOffset;
+    const chordRoot = noteName(semitone, useFlats);
+
+    // If suffix is explicit (e.g. "m7", "maj7", "7", "m7♭5", "°"), use it directly
+    if (suffix) return chordRoot + suffix;
+
+    // No suffix: infer triad quality from case
+    if (isLowerCase) {
+      // Check for diminished (°) in original token already handled by suffix
+      return chordRoot + "m";
+    }
+    return chordRoot;
+  });
+}
 
 export const CIRCLE_MAJOR = buildCircleMajor();
 export const CIRCLE_MINOR = buildCircleMinor(CIRCLE_MAJOR);

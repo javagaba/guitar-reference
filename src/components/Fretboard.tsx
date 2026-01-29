@@ -1,12 +1,12 @@
-import { FRETBOARD, STRING_LABELS, FRET_MARKERS } from "../music";
-import { NoteCircle } from "./NoteCircle";
+import { FRET_MARKERS, FRETBOARD, STRING_LABELS } from "../music";
 import { Card } from "./Card";
+import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
 
 export function Fretboard() {
   return (
     <Card className="mx-auto mt-6 max-w-[1200px]">
-      <SectionTitle>Fretboard Notes</SectionTitle>
+      <SectionTitle>Fretboard</SectionTitle>
       <div className="overflow-x-auto py-4">
         <div className="min-w-[800px]">
           {/* Fret numbers */}

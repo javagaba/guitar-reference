@@ -1,9 +1,9 @@
-import { MAJOR_KEY_CHORDS, MINOR_KEY_CHORDS } from "./music";
 import { ChordFormulas } from "./components/ChordFormulas";
+import { CircleOfFifths } from "./components/CircleOfFifths";
+import { Fretboard } from "./components/Fretboard";
 import { KeyChordsTable } from "./components/KeyChordsTable";
 import { Progressions } from "./components/Progressions";
-import { Fretboard } from "./components/Fretboard";
-import { CircleOfFifths } from "./components/CircleOfFifths";
+import { MAJOR_KEY_CHORDS, MINOR_KEY_CHORDS } from "./music";
 
 export default function App() {
   return (
@@ -12,9 +12,6 @@ export default function App() {
         <h1 className="text-[28px] font-bold tracking-tight text-white">
           Guitar Reference
         </h1>
-        <p className="mt-2 text-[13px] text-muted">
-          Chords &bull; Keys &bull; Fretboard
-        </p>
       </div>
 
       <div className="mx-auto grid max-w-[1200px] grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">

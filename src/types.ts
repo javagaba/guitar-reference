@@ -15,3 +15,10 @@ export interface ProgressionGroup {
   colorClass: string;
   progressions: string[][];
 }
+
+export interface KeySignature {
+  key: string;
+  relativeMinor: string;
+  accidentals: string[];
+  type: "sharp" | "flat" | "none";
+}

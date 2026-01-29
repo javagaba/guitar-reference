@@ -1,4 +1,4 @@
-import type { ChordFormula, KeyChords, NoteName, ProgressionGroup } from "./types";
+import type { ChordFormula, KeyChords, KeySignature, NoteName, ProgressionGroup } from "./types";
 
 // ── Foundational constants ──────────────────────────────────────────
 
@@ -6,7 +6,7 @@ const CHROMATIC_NOTES = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯"
 const CHROMATIC_FLATS = ["C", "D♭", "D", "E♭", "E", "F", "G♭", "G", "A♭", "A", "B♭", "B"];
 const STANDARD_TUNING = ["E", "B", "G", "D", "A", "E"]; // high to low
 const NATURAL_NOTES: NoteName[] = ["C", "D", "E", "F", "G", "A", "B"];
-const NUM_FRETS = 12;
+const NUM_FRETS = 24;
 
 const FLAT_KEYS = new Set(["F", "B♭", "E♭", "A♭", "D♭", "Fm", "Cm", "Gm", "Dm", "B♭m"]);
 
@@ -149,6 +149,45 @@ export const CIRCLE_MAJOR = buildCircleMajor();
 export const CIRCLE_MINOR = buildCircleMinor(CIRCLE_MAJOR);
 
 export function getNoteColor(note: string): string {
-  const base = note.replace("♯", "").replace("♭", "").charAt(0) as NoteName;
+  const base = note.replace("♯", "").replace("♭", "").replace("m", "").replace("°", "").charAt(0) as NoteName;
   return NOTE_COLORS[base] ?? "#666";
 }
+
+// ── Key signatures ─────────────────────────────────────────────────
+
+export const KEY_SIGNATURES: KeySignature[] = [
+  { key: "C",  relativeMinor: "Am",  accidentals: [],                                         type: "none" },
+  { key: "G",  relativeMinor: "Em",  accidentals: ["F♯"],                                     type: "sharp" },
+  { key: "D",  relativeMinor: "Bm",  accidentals: ["F♯", "C♯"],                               type: "sharp" },
+  { key: "A",  relativeMinor: "F♯m", accidentals: ["F♯", "C♯", "G♯"],                         type: "sharp" },
+  { key: "E",  relativeMinor: "C♯m", accidentals: ["F♯", "C♯", "G♯", "D♯"],                   type: "sharp" },
+  { key: "B",  relativeMinor: "G♯m", accidentals: ["F♯", "C♯", "G♯", "D♯", "A♯"],             type: "sharp" },
+  { key: "F♯", relativeMinor: "D♯m", accidentals: ["F♯", "C♯", "G♯", "D♯", "A♯", "E♯"],       type: "sharp" },
+  { key: "D♭", relativeMinor: "B♭m", accidentals: ["B♭", "E♭", "A♭", "D♭", "G♭"],             type: "flat" },
+  { key: "A♭", relativeMinor: "Fm",  accidentals: ["B♭", "E♭", "A♭", "D♭"],                   type: "flat" },
+  { key: "E♭", relativeMinor: "Cm",  accidentals: ["B♭", "E♭", "A♭"],                         type: "flat" },
+  { key: "B♭", relativeMinor: "Gm",  accidentals: ["B♭", "E♭"],                               type: "flat" },
+  { key: "F",  relativeMinor: "Dm",  accidentals: ["B♭"],                                     type: "flat" },
+];
+
+export function getKeySignature(key: string): KeySignature | undefined {
+  return KEY_SIGNATURES.find((ks) => ks.key === key);
+}
+
+export function getScaleNotes(root: string, intervals: number[]): string[] {
+  const rootIdx = noteIndex(root);
+  const useFlats = FLAT_KEYS.has(root) || FLAT_KEYS.has(root + "m");
+  return intervals.map((i) => noteName(rootIdx + i, useFlats));
+}
+
+export function getDiatonicChords(root: string, isMinor: boolean): string[] {
+  const intervals = isMinor ? MINOR_SCALE_INTERVALS : MAJOR_SCALE_INTERVALS;
+  const qualities = isMinor ? MINOR_CHORD_QUALITIES : MAJOR_CHORD_QUALITIES;
+  const keyLabel = isMinor ? root + "m" : root;
+  const useFlats = FLAT_KEYS.has(keyLabel);
+  const rootIdx = noteIndex(root);
+  return intervals.map((interval, i) => noteName(rootIdx + interval, useFlats) + qualities[i]);
+}
+
+export const MAJOR_NUMERALS = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
+export const MINOR_NUMERALS = ["i", "ii°", "III", "iv", "v", "VI", "VII"];

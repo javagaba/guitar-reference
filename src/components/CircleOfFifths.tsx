@@ -191,7 +191,7 @@ export function CircleOfFifths() {
     <Card className="mx-auto mt-6 max-w-[580px]">
       <SectionTitle>Circle of Fifths</SectionTitle>
       <div className="flex justify-center py-3">
-        <svg viewBox="0 0 500 500" width="480" height="480">
+        <svg viewBox="0 0 500 500" className="w-full max-w-[480px]">
           {/* Arc text labels */}
           <defs>
             <path

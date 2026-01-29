@@ -24,12 +24,20 @@ export function Fretboard() {
       <div className="flex items-center justify-between">
         <SectionTitle>Fretboard</SectionTitle>
         {hasScale && (
-          <button
-            onClick={toggleIntervals}
-            className="rounded-md bg-white/10 px-3 py-1 font-mono text-xs text-subtle transition-colors hover:bg-white/15"
-          >
-            {showIntervals ? "Intervals" : "Notes"}
-          </button>
+          <div className="flex rounded-full bg-white/10 p-0.5 font-mono text-xs">
+            <button
+              onClick={showIntervals ? toggleIntervals : undefined}
+              className={`rounded-full px-3 py-1 transition-colors ${!showIntervals ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
+            >
+              Notes
+            </button>
+            <button
+              onClick={!showIntervals ? toggleIntervals : undefined}
+              className={`rounded-full px-3 py-1 transition-colors ${showIntervals ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
+            >
+              Intervals
+            </button>
+          </div>
         )}
       </div>
       <div className="overflow-x-auto py-4">
@@ -59,7 +67,7 @@ export function Fretboard() {
           {FRETBOARD.map((string, stringIndex) => (
             <div key={stringIndex} className="mb-1 flex items-center">
               <div className="w-7 font-mono text-[11px] font-semibold text-muted">
-                {STRING_LABELS[stringIndex]}
+                {stringIndex === 0 ? "e" : STRING_LABELS[stringIndex]}
               </div>
               {string.map((note, fret) => {
                 const inScale = hasScale && isNoteInScale(note, scaleNotes);

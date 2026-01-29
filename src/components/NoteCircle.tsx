@@ -1,3 +1,4 @@
+import { useCallback, useRef } from "react";
 import { getNoteColor } from "../music";
 
 interface NoteCircleProps {
@@ -14,6 +15,31 @@ interface NoteCircleProps {
 export function NoteCircle({ note, size = 24, dimmed = false, isRoot = false, label, emphasis, colorOverride, onClick }: NoteCircleProps) {
   const bgColor = colorOverride ?? getNoteColor(note);
   const isAccidental = note.includes("♯") || note.includes("♭");
+  const innerRef = useRef<HTMLDivElement>(null);
+
+  const handleClick = useCallback(() => {
+    if (!onClick) return;
+    onClick();
+    const el = innerRef.current;
+    if (el) {
+      el.classList.add("note-ping");
+      const onEnd = () => {
+        el.classList.remove("note-ping");
+        el.removeEventListener("animationend", onEnd);
+      };
+      el.addEventListener("animationend", onEnd);
+    }
+  }, [onClick]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (onClick && (e.key === "Enter" || e.key === " ")) {
+        e.preventDefault();
+        handleClick();
+      }
+    },
+    [onClick, handleClick],
+  );
 
   return (
     <div
@@ -21,8 +47,12 @@ export function NoteCircle({ note, size = 24, dimmed = false, isRoot = false, la
       style={{ width: size, height: size }}
     >
       <div
-        className="flex items-center justify-center rounded-full font-mono font-semibold active:scale-110"
+        ref={innerRef}
+        className={`flex items-center justify-center rounded-full font-mono font-semibold active:scale-110${onClick ? " hover:scale-110" : ""}`}
         title={label ? note : undefined}
+        role={onClick ? "button" : undefined}
+        tabIndex={onClick ? 0 : undefined}
+        aria-label={onClick ? note : undefined}
         style={{
           width: size,
           height: size,
@@ -44,7 +74,8 @@ export function NoteCircle({ note, size = 24, dimmed = false, isRoot = false, la
             !dimmed && emphasis === "fifth" ? "inset 0 0 0 2px rgba(255,255,255,0.4)" : "",
           ].filter(Boolean).join(", ") || undefined,
         }}
-        onClick={onClick}
+        onClick={handleClick}
+        onKeyDown={handleKeyDown}
       >
         {label ?? note}
       </div>

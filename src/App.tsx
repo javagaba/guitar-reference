@@ -11,8 +11,10 @@ import { MAJOR_KEY_CHORDS, MINOR_KEY_CHORDS } from "./music";
 export default function App() {
   return (
     <AppProvider>
-      <div className="min-h-screen bg-bg p-8 font-sans text-text">
-        <ScaleSelector />
+      <div className="min-h-screen bg-bg px-4 pb-8 font-sans text-text sm:px-8">
+        <div className="sticky top-0 z-50 bg-bg border-b border-border/50 py-4 -mx-4 px-4 sm:-mx-8 sm:px-8">
+          <ScaleSelector />
+        </div>
         <Fretboard />
         <ChordDisplay />
 

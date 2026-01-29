@@ -48,6 +48,7 @@ export function KeyChordsTable({
   return (
     <Card>
       <SectionTitle>{title}</SectionTitle>
+      <div className="overflow-x-auto">
       <table className="w-full border-collapse text-xs">
         <thead>
           <tr>
@@ -88,7 +89,7 @@ export function KeyChordsTable({
                   return (
                     <td
                       key={j}
-                      className="p-1.5 text-center font-mono text-text-dim"
+                      className="p-1.5 text-center font-mono text-text-dim transition-colors hover:bg-white/5"
                       style={{
                         cursor: "pointer",
                         outline: isChordSelected
@@ -111,6 +112,7 @@ export function KeyChordsTable({
           })}
         </tbody>
       </table>
+      </div>
     </Card>
   );
 }

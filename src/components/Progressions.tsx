@@ -6,7 +6,7 @@ export function Progressions() {
   return (
     <Card>
       <SectionTitle>Common Progressions</SectionTitle>
-      <div className="grid grid-cols-2 gap-6">
+      <div className="grid grid-cols-1 gap-6 sm:grid-cols-2">
         {PROGRESSIONS.map((group) => (
           <div key={group.type}>
             <div className={`mb-2 text-[11px] font-semibold ${group.colorClass}`}>

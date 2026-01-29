@@ -1,7 +1,6 @@
 import { playScale } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { SCALE_DEFINITIONS } from "../music";
-import { Card } from "./Card";
 import { SectionTitle } from "./SectionTitle";
 
 const CHROMATIC_KEYS = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
@@ -12,7 +11,7 @@ export function ScaleSelector() {
   const { selectedKey, selectedScale, scaleNotes, selectKey, selectScale, clearAll } = useAppContext();
 
   return (
-    <Card className="mx-auto mt-6 max-w-[1200px]">
+    <div className="mx-auto max-w-[1200px]">
       <SectionTitle>Scale / Mode Selector</SectionTitle>
       <div className="flex flex-wrap items-center gap-4 py-2">
         <select
@@ -22,6 +21,7 @@ export function ScaleSelector() {
             if (val) selectKey(val, false);
             else selectKey(null);
           }}
+          aria-label="Select key"
           className="rounded border border-border bg-card px-2 py-1 font-mono text-sm text-text"
         >
           <option value="">Key</option>
@@ -35,6 +35,7 @@ export function ScaleSelector() {
         <select
           value={selectedScale}
           onChange={(e) => selectScale(e.target.value)}
+          aria-label="Select scale"
           className="rounded border border-border bg-card px-2 py-1 font-mono text-sm text-text"
         >
           {categories.map((cat) => (
@@ -51,7 +52,8 @@ export function ScaleSelector() {
         {selectedKey && (
           <button
             onClick={() => playScale(scaleNotes)}
-            className="rounded border border-border px-3 py-1 text-xs text-subtle transition-colors hover:border-subtle hover:text-text"
+            className="rounded border border-border px-3 py-1 text-xs text-subtle transition-colors active:scale-95 hover:border-subtle hover:text-text"
+            aria-label="Play scale"
             title="Play scale"
           >
             &#9654;
@@ -61,13 +63,14 @@ export function ScaleSelector() {
         {selectedKey && (
           <button
             onClick={clearAll}
-            className="rounded border border-border px-3 py-1 text-xs text-subtle transition-colors hover:border-subtle hover:text-text"
+            className="rounded border border-border px-3 py-1 text-xs text-subtle transition-colors active:scale-95 hover:border-subtle hover:text-text"
+            aria-label="Clear selection"
           >
             Clear
           </button>
         )}
 
       </div>
-    </Card>
+    </div>
   );
 }

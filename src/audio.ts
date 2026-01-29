@@ -23,6 +23,13 @@ function midiToFreq(midi: number): number {
 
 const DURATION = 2.5;
 
+export function playNoteAtMidi(midi: number): void {
+  const ac = getContext();
+  const t = ac.currentTime;
+  const freq = midiToFreq(midi);
+  scheduleNote(ac, freq, t);
+}
+
 export function playNote(stringIndex: number, fret: number): void {
   const ac = getContext();
   const t = ac.currentTime;

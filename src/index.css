@@ -79,3 +79,19 @@
 .collapsible > * {
   overflow: hidden;
 }
+
+@keyframes beat-pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+.beat-pulse {
+  animation: beat-pulse 150ms ease-out;
+}

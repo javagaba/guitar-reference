@@ -1,6 +1,8 @@
 import { createContext, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { useSearchParams } from "react-router-dom";
 import { getScaleNotes, noteIndex, SCALE_DEFINITIONS } from "../music";
+import { DEFAULT_TUNING, TUNINGS, type GuitarTuning } from "../tunings";
+import type { CagedShape } from "../types";
 
 interface AppState {
   selectedKey: string | null;
@@ -10,10 +12,15 @@ interface AppState {
   scaleNotes: string[];
   rootNote: string | null;
   showIntervals: boolean;
+  selectedTuning: GuitarTuning;
+  selectedCagedShapes: Set<CagedShape>;
   selectKey: (key: string | null, minor?: boolean) => void;
   selectScale: (scale: string) => void;
   selectChord: (chord: string | null) => void;
   toggleIntervals: () => void;
+  setTuning: (tuning: GuitarTuning) => void;
+  toggleCagedShape: (shape: CagedShape) => void;
+  setCagedShapes: (shapes: Set<CagedShape>) => void;
   clearAll: () => void;
 }
 
@@ -38,7 +45,26 @@ function parseInitialState(searchParams: URLSearchParams) {
     minor = true;
   }
 
-  return { key, scale, minor };
+  // Parse tuning
+  const tuningParam = searchParams.get("tuning");
+  let tuning = DEFAULT_TUNING;
+  if (tuningParam) {
+    const found = TUNINGS.find((t) => t.name === tuningParam);
+    if (found) tuning = found;
+  }
+
+  // Parse CAGED
+  const cagedParam = searchParams.get("caged");
+  const cagedShapes = new Set<CagedShape>();
+  if (cagedParam) {
+    for (const s of cagedParam.split(",")) {
+      if (["C", "A", "G", "E", "D"].includes(s)) {
+        cagedShapes.add(s as CagedShape);
+      }
+    }
+  }
+
+  return { key, scale, minor, tuning, cagedShapes };
 }
 
 export function AppProvider({ children }: { children: ReactNode }) {
@@ -51,6 +77,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [selectedScale, setSelectedScale] = useState(initial.scale);
   const [selectedChord, setSelectedChord] = useState<string | null>(null);
   const [showIntervals, setShowIntervals] = useState(false);
+  const [selectedTuning, setSelectedTuning] = useState<GuitarTuning>(initial.tuning);
+  const [selectedCagedShapes, setSelectedCagedShapes] = useState<Set<CagedShape>>(initial.cagedShapes);
 
   useEffect(() => {
     setSearchParams(
@@ -71,11 +99,21 @@ export function AppProvider({ children }: { children: ReactNode }) {
         } else {
           next.delete("minor");
         }
+        if (selectedTuning.name !== "Standard") {
+          next.set("tuning", selectedTuning.name);
+        } else {
+          next.delete("tuning");
+        }
+        if (selectedCagedShapes.size > 0) {
+          next.set("caged", [...selectedCagedShapes].join(","));
+        } else {
+          next.delete("caged");
+        }
         return next;
       },
       { replace: true },
     );
-  }, [selectedKey, selectedScale, isMinor, setSearchParams]);
+  }, [selectedKey, selectedScale, isMinor, selectedTuning, selectedCagedShapes, setSearchParams]);
 
   const scaleNotes = useMemo(() => {
     if (!selectedKey) return [];
@@ -93,12 +131,10 @@ export function AppProvider({ children }: { children: ReactNode }) {
       setSelectedChord(null);
       return;
     }
-    // Strip trailing "m" if present
     const root = key.endsWith("m") && !key.endsWith("♭m") ? key.slice(0, -1) : key;
     const isM = minor ?? key.endsWith("m");
     setSelectedKey(root);
     setIsMinor(isM);
-    // When key changes, update scale to match major/minor
     if (isM && selectedScale === "Major") {
       setSelectedScale("Natural Minor");
     } else if (!isM && selectedScale === "Natural Minor") {
@@ -119,11 +155,34 @@ export function AppProvider({ children }: { children: ReactNode }) {
     setShowIntervals((v) => !v);
   }
 
+  function setTuning(tuning: GuitarTuning) {
+    setSelectedTuning(tuning);
+    // Clear CAGED shapes when changing tuning
+    setSelectedCagedShapes(new Set());
+  }
+
+  function toggleCagedShape(shape: CagedShape) {
+    setSelectedCagedShapes((prev) => {
+      const next = new Set(prev);
+      if (next.has(shape)) {
+        next.delete(shape);
+      } else {
+        next.add(shape);
+      }
+      return next;
+    });
+  }
+
+  function setCagedShapes(shapes: Set<CagedShape>) {
+    setSelectedCagedShapes(shapes);
+  }
+
   function clearAll() {
     setSelectedKey(null);
     setIsMinor(false);
     setSelectedScale("Major");
     setSelectedChord(null);
+    setSelectedCagedShapes(new Set());
   }
 
   const value = useMemo<AppState>(
@@ -135,13 +194,18 @@ export function AppProvider({ children }: { children: ReactNode }) {
       scaleNotes,
       rootNote,
       showIntervals,
+      selectedTuning,
+      selectedCagedShapes,
       selectKey,
       selectScale,
       selectChord,
       toggleIntervals,
+      setTuning,
+      toggleCagedShape,
+      setCagedShapes,
       clearAll,
     }),
-    [selectedKey, isMinor, selectedScale, selectedChord, scaleNotes, showIntervals],
+    [selectedKey, isMinor, selectedScale, selectedChord, scaleNotes, showIntervals, selectedTuning, selectedCagedShapes],
   );
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

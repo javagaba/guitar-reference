@@ -2,14 +2,49 @@ import { useMemo } from "react";
 import { playScale } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { getNoteColor, getScaleTriads, SCALE_DEFINITIONS } from "../music";
+import { TUNINGS } from "../tunings";
 import { SectionTitle } from "./SectionTitle";
 
-const CHROMATIC_KEYS = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+const CHROMATIC_KEYS = [
+  "C",
+  "C♯",
+  "D",
+  "D♯",
+  "E",
+  "F",
+  "F♯",
+  "G",
+  "G♯",
+  "A",
+  "A♯",
+  "B",
+];
 
-const categories = ["Diatonic", "Pentatonic", "Blues", "Mode", "Harmonic", "Melodic", "Exotic"] as const;
+const categories = [
+  "Diatonic",
+  "Pentatonic",
+  "Blues",
+  "Mode",
+  "Harmonic",
+  "Melodic",
+  "Exotic",
+] as const;
+
+const tuningCategories = ["Standard", "Drop", "Open", "Other"] as const;
 
 export function ScaleSelector() {
-  const { selectedKey, selectedScale, selectedChord, scaleNotes, selectKey, selectScale, selectChord, clearAll } = useAppContext();
+  const {
+    selectedKey,
+    selectedScale,
+    selectedChord,
+    scaleNotes,
+    selectedTuning,
+    selectKey,
+    selectScale,
+    selectChord,
+    setTuning,
+    clearAll,
+  } = useAppContext();
 
   const def = SCALE_DEFINITIONS.find((s) => s.name === selectedScale);
 
@@ -20,7 +55,7 @@ export function ScaleSelector() {
 
   return (
     <div className="mx-auto max-w-[1200px]">
-      <SectionTitle>Scale / Mode Selector</SectionTitle>
+      <SectionTitle>Scale / Mode</SectionTitle>
       <div className="flex flex-wrap items-center gap-4 py-2">
         <select
           value={selectedKey ?? ""}
@@ -51,6 +86,26 @@ export function ScaleSelector() {
               {SCALE_DEFINITIONS.filter((s) => s.category === cat).map((s) => (
                 <option key={s.name} value={s.name}>
                   {s.name}
+                </option>
+              ))}
+            </optgroup>
+          ))}
+        </select>
+
+        <select
+          value={selectedTuning.name}
+          onChange={(e) => {
+            const found = TUNINGS.find((t) => t.name === e.target.value);
+            if (found) setTuning(found);
+          }}
+          aria-label="Select tuning"
+          className="rounded border border-border bg-card px-3 py-2 font-mono text-sm text-text"
+        >
+          {tuningCategories.map((cat) => (
+            <optgroup key={cat} label={cat}>
+              {TUNINGS.filter((t) => t.category === cat).map((t) => (
+                <option key={t.name} value={t.name}>
+                  {t.name} ({[...t.notes].reverse().join("")})
                 </option>
               ))}
             </optgroup>
@@ -88,7 +143,14 @@ export function ScaleSelector() {
                   key={t.degree}
                   onClick={() => selectChord(isActive ? null : t.chordName)}
                   className="flex flex-col items-center rounded px-2 py-1 text-xs transition-colors hover:bg-card"
-                  style={isActive ? { boxShadow: `0 0 0 1.5px ${color}`, background: "var(--color-card)" } : undefined}
+                  style={
+                    isActive
+                      ? {
+                          boxShadow: `0 0 0 1.5px ${color}`,
+                          background: "var(--color-card)",
+                        }
+                      : undefined
+                  }
                 >
                   <span className="text-[10px] text-subtle">{t.numeral}</span>
                   <span className="font-mono font-medium" style={{ color }}>

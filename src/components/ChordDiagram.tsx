@@ -1,3 +1,4 @@
+import { getNoteColor, noteIndex } from "../music";
 import type { ChordVoicing } from "../types";
 
 const STRINGS = 6;
@@ -11,15 +12,43 @@ const DOT_R = 7;
 const WIDTH = PADDING_LEFT + (STRINGS - 1) * STRING_SPACING + 20;
 const HEIGHT = PADDING_TOP + FRETS_SHOWN * FRET_SPACING + PADDING_BOTTOM;
 
-export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
+// Standard tuning note names for each string (low E to high E)
+const STANDARD_NOTES = ["E", "A", "D", "G", "B", "E"];
+const CHROMATIC = ["C", "C♯", "D", "D♯", "E", "F", "F♯", "G", "G♯", "A", "A♯", "B"];
+
+function getNoteAtFret(stringIndex: number, fret: number): string {
+  const openIdx = noteIndex(STANDARD_NOTES[stringIndex]);
+  return CHROMATIC[(openIdx + fret) % 12];
+}
+
+interface ChordDiagramProps {
+  voicing: ChordVoicing;
+  highlightBass?: string;
+}
+
+export function ChordDiagram({ voicing, highlightBass }: ChordDiagramProps) {
   const { frets, fingers, barreAt, barreStrings, baseFret } = voicing;
-  const showBaseFret = baseFret > 1;
 
   function stringX(s: number) {
     return PADDING_LEFT + s * STRING_SPACING;
   }
   function fretY(f: number) {
     return PADDING_TOP + f * FRET_SPACING;
+  }
+
+  // Find lowest sounding string for bass highlight
+  let bassStringIndex = -1;
+  if (highlightBass) {
+    const bassIdx = noteIndex(highlightBass);
+    for (let s = STRINGS - 1; s >= 0; s--) {
+      if (frets[s] >= 0) {
+        const noteAtString = getNoteAtFret(s, frets[s]);
+        if (noteIndex(noteAtString) === bassIdx) {
+          bassStringIndex = s;
+          break;
+        }
+      }
+    }
   }
 
   return (
@@ -56,7 +85,7 @@ export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
           x2={stringX(STRINGS - 1)}
           y2={fretY(f)}
           stroke="#444"
-          strokeWidth={f === 0 && baseFret > 1 ? 1 : 1}
+          strokeWidth={1}
         />
       ))}
 
@@ -89,9 +118,9 @@ export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
       {/* Finger dots, X, O indicators */}
       {frets.map((fret, s) => {
         const x = stringX(s);
+        const isBassHighlight = s === bassStringIndex;
 
         if (fret === -1) {
-          // Muted string
           return (
             <text
               key={`x-${s}`}
@@ -108,7 +137,6 @@ export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
         }
 
         if (fret === 0 || (baseFret > 1 && fret === baseFret && barreAt !== undefined)) {
-          // Open string (only for baseFret === 1)
           if (fret === 0) {
             return (
               <circle
@@ -116,19 +144,17 @@ export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
                 cx={x}
                 cy={fretY(0) - 12}
                 r={5}
-                fill="none"
-                stroke="#999"
+                fill={isBassHighlight ? getNoteColor(highlightBass!) : "none"}
+                stroke={isBassHighlight ? getNoteColor(highlightBass!) : "#999"}
                 strokeWidth="1.5"
               />
             );
           }
         }
 
-        // Finger position
         const displayFret = fret - baseFret + 1;
         if (displayFret < 1 || displayFret > FRETS_SHOWN) return null;
 
-        // Skip individual dots if they're covered by barre
         if (
           barreAt !== undefined &&
           barreStrings &&
@@ -139,20 +165,23 @@ export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
           return null;
         }
 
+        const dotColor = isBassHighlight ? getNoteColor(highlightBass!) : "white";
+        const textColor = isBassHighlight ? "#fff" : "#111";
+
         return (
           <g key={`dot-${s}`}>
             <circle
               cx={x}
               cy={fretY(displayFret) - FRET_SPACING / 2}
               r={DOT_R}
-              fill="white"
+              fill={dotColor}
             />
             {fingers[s] > 0 && (
               <text
                 x={x}
                 y={fretY(displayFret) - FRET_SPACING / 2 + 4}
                 textAnchor="middle"
-                fill="#111"
+                fill={textColor}
                 fontSize="10"
                 fontWeight="600"
                 fontFamily="'JetBrains Mono', monospace"

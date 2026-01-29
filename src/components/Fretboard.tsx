@@ -1,23 +1,64 @@
-import { playNote } from "../audio";
+import { useMemo } from "react";
+import { playNoteAtMidi } from "../audio";
+import { getCagedBoxesForKey } from "../cagedPatterns";
 import { useAppContext } from "../context/AppContext";
 import {
+  buildFretboardForTuning,
   FRET_MARKERS,
-  FRETBOARD,
   getDegreeColor,
   getScaleDegree,
   isNoteInScale,
   noteIndex,
-  STRING_LABELS,
 } from "../music";
+import { isStandardIntervalTuning } from "../tunings";
+import type { CagedShape } from "../types";
 import { Card } from "./Card";
 import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
 
+const ALL_CAGED: CagedShape[] = ["C", "A", "G", "E", "D"];
+
 export function Fretboard() {
-  const { scaleNotes, rootNote, showIntervals, toggleIntervals } =
-    useAppContext();
+  const {
+    scaleNotes,
+    rootNote,
+    showIntervals,
+    toggleIntervals,
+    selectedTuning,
+    selectedCagedShapes,
+    toggleCagedShape,
+    setCagedShapes,
+  } = useAppContext();
   const hasScale = scaleNotes.length > 0;
   const rootIdx = rootNote ? noteIndex(rootNote) : -1;
+
+  const fretboard = useMemo(
+    () => buildFretboardForTuning(selectedTuning.notes),
+    [selectedTuning],
+  );
+  const stringLabels = selectedTuning.notes;
+
+  const isStandard = useMemo(
+    () => isStandardIntervalTuning(selectedTuning),
+    [selectedTuning],
+  );
+
+  const cagedBoxes = useMemo(() => {
+    if (!rootNote || !isStandard || selectedCagedShapes.size === 0) return null;
+    return getCagedBoxesForKey(rootNote);
+  }, [rootNote, isStandard, selectedCagedShapes]);
+
+  function isInCagedBox(fret: number): { inBox: boolean; color: string | null } {
+    if (!cagedBoxes || selectedCagedShapes.size === 0) return { inBox: false, color: null };
+    for (const box of cagedBoxes) {
+      if (selectedCagedShapes.has(box.shape) && fret >= box.lowFret && fret <= box.highFret) {
+        return { inBox: true, color: box.color };
+      }
+    }
+    return { inBox: false, color: null };
+  }
+
+  const showCagedControls = hasScale && isStandard;
 
   return (
     <Card className="mx-auto mt-6 max-w-300">
@@ -40,12 +81,45 @@ export function Fretboard() {
           </div>
         )}
       </div>
+
+      {showCagedControls && (
+        <div className="flex items-center gap-2 pt-2">
+          <span className="text-[11px] text-subtle">CAGED:</span>
+          {ALL_CAGED.map((shape) => {
+            const active = selectedCagedShapes.has(shape);
+            return (
+              <button
+                key={shape}
+                onClick={() => toggleCagedShape(shape)}
+                className={`rounded px-2 py-0.5 font-mono text-xs transition-colors ${
+                  active
+                    ? "bg-white/20 text-text"
+                    : "text-muted hover:text-subtle"
+                }`}
+              >
+                {shape}
+              </button>
+            );
+          })}
+          <button
+            onClick={() =>
+              selectedCagedShapes.size === ALL_CAGED.length
+                ? setCagedShapes(new Set())
+                : setCagedShapes(new Set(ALL_CAGED))
+            }
+            className="ml-1 rounded px-2 py-0.5 text-[10px] text-subtle hover:text-text"
+          >
+            {selectedCagedShapes.size === ALL_CAGED.length ? "None" : "All"}
+          </button>
+        </div>
+      )}
+
       <div className="overflow-x-auto py-4">
         <div className="min-w-200">
           {/* Fret numbers */}
           <div className="mb-2 flex items-center">
             <div className="w-7 shrink-0" />
-            {FRETBOARD[0].map((_, fret) => (
+            {fretboard[0].map((_, fret) => (
               <div
                 key={fret}
                 className={`w-14 text-center font-mono text-[11px] ${
@@ -64,15 +138,18 @@ export function Fretboard() {
           </div>
 
           {/* Strings */}
-          {FRETBOARD.map((string, stringIndex) => (
+          {fretboard.map((string, stringIndex) => (
             <div key={stringIndex} className="mb-1 flex items-center">
               <div className="w-7 font-mono text-xs font-semibold text-muted">
-                {stringIndex === 0 ? "e" : STRING_LABELS[stringIndex]}
+                {stringIndex === 0 ? stringLabels[0].toLowerCase() : stringLabels[stringIndex]}
               </div>
               {string.map((note, fret) => {
                 const inScale = hasScale && isNoteInScale(note, scaleNotes);
                 const isRoot = hasScale && noteIndex(note) === rootIdx;
-                const dimmed = hasScale && !inScale;
+
+                const caged = isInCagedBox(fret);
+                const dimmedByCaged = caged.color !== null && !caged.inBox;
+                const dimmed = hasScale && (!inScale || (selectedCagedShapes.size > 0 && !caged.inBox && inScale));
 
                 const degree = hasScale
                   ? getScaleDegree(note, scaleNotes)
@@ -99,9 +176,11 @@ export function Fretboard() {
                     style={{
                       borderLeft:
                         fret === 0 ? "3px solid #555" : "1px solid #333",
-                      backgroundColor: FRET_MARKERS.includes(fret)
-                        ? "rgba(255,255,255,0.02)"
-                        : "transparent",
+                      backgroundColor: caged.inBox && inScale
+                        ? caged.color!
+                        : FRET_MARKERS.includes(fret)
+                          ? "rgba(255,255,255,0.02)"
+                          : "transparent",
                     }}
                   >
                     <NoteCircle
@@ -116,7 +195,9 @@ export function Fretboard() {
                           ? getDegreeColor(degree)
                           : undefined
                       }
-                      onClick={() => playNote(stringIndex, fret)}
+                      onClick={() =>
+                        playNoteAtMidi(selectedTuning.midiNotes[stringIndex] + fret)
+                      }
                     />
                   </div>
                 );
@@ -127,7 +208,7 @@ export function Fretboard() {
           {/* Fret dot markers */}
           <div className="mt-2 flex items-center">
             <div className="w-7 shrink-0" />
-            {FRETBOARD[0].map((_, fret) => (
+            {fretboard[0].map((_, fret) => (
               <div
                 key={fret}
                 className="w-14 text-center text-subtle"

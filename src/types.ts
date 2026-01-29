@@ -45,6 +45,8 @@ export interface ScaleTriad {
   numeral: string;
 }
 
+export type VoicingCategory = "open" | "barre-e" | "barre-a" | "shell" | "drop2" | "drop3" | "partial";
+
 export interface ChordVoicing {
   name: string;
   frets: (number | -1)[]; // -1 = muted, 0 = open, 1+ = fret number (6 strings, low E to high E)
@@ -52,4 +54,21 @@ export interface ChordVoicing {
   barreAt?: number; // fret number for barre
   barreStrings?: [number, number]; // [from, to] string indices
   baseFret: number; // 1 for open chords, higher for barre chords
+  category?: VoicingCategory;
+  label?: string;
+  bassNote?: string;
+}
+
+export type CagedShape = "C" | "A" | "G" | "E" | "D";
+
+export interface SecondaryDominant {
+  symbol: string;     // e.g. "V/ii"
+  chord: string;      // e.g. "A7"
+  resolvesTo: string; // e.g. "Dm"
+}
+
+export interface BorrowedChord {
+  chord: string;      // e.g. "Fm"
+  source: string;     // e.g. "Parallel Minor"
+  numeral: string;    // e.g. "iv"
 }

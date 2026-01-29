@@ -1,4 +1,5 @@
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
+import { Metronome } from "./components/Metronome";
 import { ScaleSelector } from "./components/ScaleSelector";
 import { AppProvider } from "./context/AppContext";
 import { HomePage } from "./pages/HomePage";
@@ -33,11 +34,8 @@ export default function App() {
             <Route path="/" element={<HomePage />} />
             <Route path="/reference" element={<ReferencePage />} />
           </Routes>
-
-          <div className="mt-8 text-center text-[11px] text-[#444]">
-            Standard Tuning (EADGBE)
-          </div>
         </div>
+        <Metronome />
       </AppProvider>
     </BrowserRouter>
   );

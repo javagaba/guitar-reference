@@ -1,6 +1,7 @@
 import { ChordDisplay } from "../components/ChordDisplay";
 import { KeyChordsTable } from "../components/KeyChordsTable";
 import { Progressions } from "../components/Progressions";
+import { SecondaryAndBorrowed } from "../components/SecondaryAndBorrowed";
 import { MAJOR_KEY_CHORDS, MINOR_KEY_CHORDS } from "../music";
 
 export function ReferencePage() {
@@ -25,6 +26,7 @@ export function ReferencePage() {
         ]}
       />
       <Progressions />
+      <SecondaryAndBorrowed />
     </div>
     </>
   );

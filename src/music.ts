@@ -1,4 +1,5 @@
 import type {
+  BorrowedChord,
   ChordFormula,
   ChordQuality,
   KeyChords,
@@ -8,6 +9,7 @@ import type {
   ProgressionGroup,
   ScaleDefinition,
   ScaleTriad,
+  SecondaryDominant,
 } from "./types";
 
 // ── Foundational constants ──────────────────────────────────────────
@@ -93,6 +95,16 @@ function buildNoteColors(): Record<NoteName, string> {
 
 function buildFretboard(): string[][] {
   return STANDARD_TUNING.map((open) => {
+    const start = noteIndex(open);
+    return Array.from(
+      { length: NUM_FRETS + 1 },
+      (_, i) => CHROMATIC_NOTES[(start + i) % 12],
+    );
+  });
+}
+
+export function buildFretboardForTuning(tuningNotes: string[]): string[][] {
+  return tuningNotes.map((open) => {
     const start = noteIndex(open);
     return Array.from(
       { length: NUM_FRETS + 1 },
@@ -543,3 +555,130 @@ export const SCALE_DEFINITIONS: ScaleDefinition[] = [
     intervals: [0, 2, 3, 5, 6, 8, 9, 11],
   },
 ];
+
+// ── Secondary Dominants ─────────────────────────────────────────────
+
+const MAJOR_SCALE_ROMAN_LABELS = ["I", "ii", "iii", "IV", "V", "vi", "vii°"];
+const MINOR_SCALE_ROMAN_LABELS = ["i", "ii°", "III", "iv", "v", "VI", "VII"];
+
+export function getSecondaryDominants(root: string, isMinor: boolean): SecondaryDominant[] {
+  const intervals = isMinor ? MINOR_SCALE_INTERVALS : MAJOR_SCALE_INTERVALS;
+  const qualities = isMinor ? MINOR_CHORD_QUALITIES : MAJOR_CHORD_QUALITIES;
+  const romanLabels = isMinor ? MINOR_SCALE_ROMAN_LABELS : MAJOR_SCALE_ROMAN_LABELS;
+  const keyLabel = isMinor ? root + "m" : root;
+  const useFlats = FLAT_KEYS.has(keyLabel);
+  const rootIdx = noteIndex(root);
+
+  const results: SecondaryDominant[] = [];
+
+  for (let i = 0; i < 7; i++) {
+    // Skip diminished chords (can't be targets of secondary dominants)
+    if (qualities[i] === "°") continue;
+    // Skip degree I (V/I = V, which is just the regular dominant)
+    if (i === 0) continue;
+
+    const targetSemitone = rootIdx + intervals[i];
+    const targetRoot = noteName(targetSemitone, useFlats);
+    const targetChord = targetRoot + qualities[i];
+
+    // V7 of the target = a dom7 chord whose root is a perfect fifth above the target
+    const domSemitone = targetSemitone + 7;
+    const domRoot = noteName(domSemitone, useFlats);
+    const domChord = domRoot + "7";
+
+    results.push({
+      symbol: `V/${romanLabels[i]}`,
+      chord: domChord,
+      resolvesTo: targetChord,
+    });
+  }
+
+  return results;
+}
+
+// ── Borrowed Chords (Modal Interchange) ─────────────────────────────
+
+export function getBorrowedChords(root: string, isMinor: boolean): BorrowedChord[] {
+  const keyLabel = isMinor ? root + "m" : root;
+  const useFlats = FLAT_KEYS.has(keyLabel);
+  const rootIdx = noteIndex(root);
+
+  if (!isMinor) {
+    // Borrow from parallel minor
+    return [
+      {
+        chord: noteName(rootIdx + 3, useFlats),
+        source: "Parallel Minor",
+        numeral: "♭III",
+      },
+      {
+        chord: noteName(rootIdx + 5, useFlats) + "m",
+        source: "Parallel Minor",
+        numeral: "iv",
+      },
+      {
+        chord: noteName(rootIdx + 8, useFlats),
+        source: "Parallel Minor",
+        numeral: "♭VI",
+      },
+      {
+        chord: noteName(rootIdx + 10, useFlats),
+        source: "Parallel Minor",
+        numeral: "♭VII",
+      },
+    ];
+  } else {
+    // Borrow from parallel major
+    return [
+      {
+        chord: noteName(rootIdx + 5, useFlats),
+        source: "Parallel Major",
+        numeral: "IV",
+      },
+      {
+        chord: noteName(rootIdx + 7, useFlats),
+        source: "Parallel Major",
+        numeral: "V",
+      },
+    ];
+  }
+}
+
+// ── Chord Inversions ─────────────────────────────────────────────────
+
+export interface ChordInversion {
+  inversionNumber: number;
+  label: string;        // "Root Position", "1st Inversion", etc.
+  slashNotation: string; // "C/E"
+  bassNote: string;
+  notes: string[];       // reordered from bass
+}
+
+export function getChordInversions(
+  chordName: string,
+  root: string,
+  formulaNotes: string[],
+): ChordInversion[] {
+  if (formulaNotes.length < 2) return [];
+
+  return formulaNotes.map((bassNote, i) => {
+    const reordered = [...formulaNotes.slice(i), ...formulaNotes.slice(0, i)];
+    const labels = ["Root Position", "1st Inversion", "2nd Inversion", "3rd Inversion", "4th Inversion"];
+    return {
+      inversionNumber: i,
+      label: labels[i] || `${i}th Inversion`,
+      slashNotation: i === 0 ? chordName : `${chordName}/${bassNote}`,
+      bassNote,
+      notes: reordered,
+    };
+  });
+}
+
+export function parseSlashChord(name: string): { chord: string; bass: string } | null {
+  const idx = name.indexOf("/");
+  if (idx < 0) return null;
+  const chord = name.slice(0, idx);
+  const bass = name.slice(idx + 1);
+  if (!chord || !bass) return null;
+  return { chord, bass };
+}

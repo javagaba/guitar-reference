@@ -30,7 +30,7 @@ export function ScaleSelector() {
             else selectKey(null);
           }}
           aria-label="Select key"
-          className="rounded border border-border bg-card px-2 py-1 font-mono text-sm text-text"
+          className="rounded border border-border bg-card px-3 py-2 font-mono text-sm text-text"
         >
           <option value="">Key</option>
           {CHROMATIC_KEYS.map((k) => (
@@ -44,7 +44,7 @@ export function ScaleSelector() {
           value={selectedScale}
           onChange={(e) => selectScale(e.target.value)}
           aria-label="Select scale"
-          className="rounded border border-border bg-card px-2 py-1 font-mono text-sm text-text"
+          className="rounded border border-border bg-card px-3 py-2 font-mono text-sm text-text"
         >
           {categories.map((cat) => (
             <optgroup key={cat} label={cat}>

@@ -46,7 +46,7 @@ function SectionTable({ section }: { section: TableSection }) {
       <h3 className="mb-1 mt-3 text-[11px] font-semibold uppercase tracking-wider text-subtle first:mt-0">
         {section.subtitle}
       </h3>
-      <table className="w-full border-collapse text-xs">
+      <table className="w-full min-w-[480px] border-collapse text-xs sm:text-sm">
         <thead>
           <tr>
             <th className="p-2 text-center text-[11px] font-semibold text-subtle">
@@ -76,7 +76,7 @@ function SectionTable({ section }: { section: TableSection }) {
                 onClick={() => handleRowClick(row)}
               >
                 <td
-                  className="p-1.5 text-center font-mono font-semibold"
+                  className="p-2 text-center font-mono font-semibold"
                   style={{ color: getNoteColor(row.key) }}
                 >
                   {row.key}
@@ -86,7 +86,7 @@ function SectionTable({ section }: { section: TableSection }) {
                   return (
                     <td
                       key={j}
-                      className="p-1.5 text-center font-mono text-text-dim transition-colors hover:bg-white/5"
+                      className="p-2 text-center font-mono text-text-dim transition-colors hover:bg-white/5"
                       style={{
                         cursor: "pointer",
                         outline: isChordSelected

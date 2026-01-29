@@ -364,14 +364,14 @@ export function CircleOfFifths() {
 
           {/* Scale notes */}
           <div className="mb-3">
-            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
               Scale
             </div>
             <div className="flex gap-2">
               {scaleNotes.map((n, i) => (
                 <div key={i} className="flex flex-col items-center gap-0.5">
                   <NoteCircle note={n} size={28} />
-                  <span className="text-[9px] text-subtle">{i + 1}</span>
+                  <span className="text-[10px] text-subtle">{i + 1}</span>
                 </div>
               ))}
             </div>
@@ -379,7 +379,7 @@ export function CircleOfFifths() {
 
           {/* Diatonic chords */}
           <div className="mb-3">
-            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
               Diatonic Chords
             </div>
             <div className="flex gap-2">
@@ -387,9 +387,9 @@ export function CircleOfFifths() {
                 const isChordSelected = selectedChord === chord;
                 return (
                   <div key={i} className="flex flex-col items-center gap-0.5">
-                    <span className="text-[9px] text-subtle">{numerals[i]}</span>
+                    <span className="text-[10px] text-subtle">{numerals[i]}</span>
                     <div
-                      className="flex h-7 items-center justify-center rounded px-1.5 font-mono text-[11px] font-semibold"
+                      className="flex h-9 items-center justify-center rounded px-2 font-mono text-xs font-semibold"
                       style={{
                         backgroundColor: getNoteColor(chord) + "22",
                         color: getNoteColor(chord),
@@ -411,14 +411,14 @@ export function CircleOfFifths() {
 
           {/* Related keys */}
           <div>
-            <div className="mb-1 text-[10px] font-semibold uppercase tracking-wider text-muted">
+            <div className="mb-1 text-[11px] font-semibold uppercase tracking-wider text-muted">
               Related Keys
             </div>
             <div className="flex flex-wrap gap-1.5">
               {relativeLabel && (
                 <button
                   onClick={() => navigateTo(relativeLabel)}
-                  className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] font-medium text-text-dim transition-colors hover:border-subtle hover:text-text"
+                  className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-medium text-text-dim transition-colors hover:border-subtle hover:text-text"
                 >
                   {isMinor ? "Relative Major: " : "Relative Minor: "}
                   {relativeLabel}
@@ -428,7 +428,7 @@ export function CircleOfFifths() {
                 <button
                   key={nk}
                   onClick={() => navigateTo(nk)}
-                  className="rounded-full border border-border px-2.5 py-0.5 font-mono text-[11px] font-medium text-text-dim transition-colors hover:border-subtle hover:text-text"
+                  className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-medium text-text-dim transition-colors hover:border-subtle hover:text-text"
                 >
                   {nk}
                 </button>

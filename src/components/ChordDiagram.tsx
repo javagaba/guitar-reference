@@ -23,7 +23,7 @@ export function ChordDiagram({ voicing }: { voicing: ChordVoicing }) {
   }
 
   return (
-    <svg width={WIDTH} height={HEIGHT} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
+    <svg className="w-[120px] sm:w-[140px]" style={{ aspectRatio: `${WIDTH} / ${HEIGHT}` }} viewBox={`0 0 ${WIDTH} ${HEIGHT}`}>
       {/* Nut or base fret indicator */}
       {baseFret === 1 ? (
         <line

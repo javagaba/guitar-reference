@@ -7,7 +7,7 @@ export const Card = forwardRef<
   return (
     <div
       ref={ref}
-      className={`rounded-xl border border-border bg-card px-3 py-2 sm:px-4 ${className}`}
+      className={`rounded-xl border border-border bg-card px-3 py-3 sm:px-4 sm:py-4 ${className}`}
     >
       {children}
     </div>

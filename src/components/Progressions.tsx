@@ -24,7 +24,7 @@ export function Progressions() {
               return (
                 <div key={i} className="py-1.5">
                   {prog.name && (
-                    <div className="text-[10px] text-text-dimmest">
+                    <div className="text-[11px] text-text-dimmest">
                       {prog.name}
                     </div>
                   )}
@@ -37,7 +37,7 @@ export function Progressions() {
                             {" "}
                             <button
                               type="button"
-                              className="hover:brightness-125 cursor-pointer"
+                              className="inline-flex items-center px-1.5 py-1 rounded hover:bg-white/5 hover:brightness-125 cursor-pointer"
                               style={{ color: getNoteColor(resolved[j]) }}
                               onClick={() => selectChord(resolved[j])}
                             >

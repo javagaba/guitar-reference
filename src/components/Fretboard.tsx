@@ -48,7 +48,7 @@ export function Fretboard() {
             {FRETBOARD[0].map((_, fret) => (
               <div
                 key={fret}
-                className={`w-14 text-center font-mono text-[10px] ${
+                className={`w-14 text-center font-mono text-[11px] ${
                   FRET_MARKERS.includes(fret) ? "text-subtle" : "text-[#555]"
                 }`}
                 style={{
@@ -66,7 +66,7 @@ export function Fretboard() {
           {/* Strings */}
           {FRETBOARD.map((string, stringIndex) => (
             <div key={stringIndex} className="mb-1 flex items-center">
-              <div className="w-7 font-mono text-[11px] font-semibold text-muted">
+              <div className="w-7 font-mono text-xs font-semibold text-muted">
                 {stringIndex === 0 ? "e" : STRING_LABELS[stringIndex]}
               </div>
               {string.map((note, fret) => {

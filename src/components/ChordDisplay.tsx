@@ -34,13 +34,13 @@ export function ChordDisplay() {
               </span>
               <button
                 onClick={() => selectChord(null)}
-                className="rounded border border-border px-2 py-0.5 text-[10px] text-subtle transition-colors hover:border-subtle hover:text-text"
+                className="rounded border border-border px-3 py-1.5 text-xs text-subtle transition-colors hover:border-subtle hover:text-text"
               >
                 Close
               </button>
             </div>
             {voicings.length > 0 ? (
-              <div className="flex gap-6 overflow-x-auto py-3">
+              <div className="flex gap-3 sm:gap-6 overflow-x-auto py-3">
                 {voicings.map((v, i) => (
                   <div key={i} className="flex flex-col items-center gap-1">
                     <ChordDiagram voicing={v} />

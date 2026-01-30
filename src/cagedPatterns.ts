@@ -10,7 +10,12 @@ export interface CagedBox {
 
 // Reference positions for A minor pentatonic (root = A, noteIndex = 9)
 // These define the 5 CAGED box positions as fret ranges
-const CAGED_REFERENCE: { shape: CagedShape; color: string; lowFret: number; highFret: number }[] = [
+const CAGED_REFERENCE: {
+  shape: CagedShape;
+  color: string;
+  lowFret: number;
+  highFret: number;
+}[] = [
   { shape: "E", color: "rgba(239,68,68,0.12)", lowFret: 0, highFret: 3 },
   { shape: "D", color: "rgba(168,85,247,0.12)", lowFret: 2, highFret: 5 },
   { shape: "C", color: "rgba(59,130,246,0.12)", lowFret: 4, highFret: 8 },
@@ -20,11 +25,11 @@ const CAGED_REFERENCE: { shape: CagedShape; color: string; lowFret: number; high
 
 const REFERENCE_ROOT = 9; // A
 
-const MAX_FRET = 21;
+const MAX_FRET = 24;
 
 export function getCagedBoxesForKey(root: string): CagedBox[] {
   const rootIdx = noteIndex(root);
-  const offset = ((rootIdx - REFERENCE_ROOT) + 12) % 12;
+  const offset = (rootIdx - REFERENCE_ROOT + 12) % 12;
   const boxes: CagedBox[] = [];
 
   for (const ref of CAGED_REFERENCE) {

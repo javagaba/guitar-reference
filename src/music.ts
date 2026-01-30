@@ -43,7 +43,7 @@ const CHROMATIC_FLATS = [
 ];
 const STANDARD_TUNING = ["E", "B", "G", "D", "A", "E"]; // high to low
 const NATURAL_NOTES: NoteName[] = ["C", "D", "E", "F", "G", "A", "B"];
-const NUM_FRETS = 21;
+const NUM_FRETS = 24;
 
 const FLAT_KEYS = new Set([
   "F",

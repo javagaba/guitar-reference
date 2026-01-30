@@ -19,8 +19,7 @@ export default function App() {
       <AppProvider>
         <div className="min-h-screen bg-bg px-4 pb-8 font-sans text-text sm:px-8">
           <div className="sticky top-0 z-50 bg-bg border-b border-border/50 py-4 -mx-4 px-4 sm:-mx-8 sm:px-8">
-            <ScaleSelector />
-            <nav className="mx-auto mt-2 flex max-w-[1200px] gap-2">
+            <nav className="mx-auto mb-4 flex max-w-[1200px] gap-2">
               <NavLink to="/" end className={navClass}>
                 Home
               </NavLink>
@@ -28,6 +27,7 @@ export default function App() {
                 Reference
               </NavLink>
             </nav>
+            <ScaleSelector />
           </div>
 
           <Routes>

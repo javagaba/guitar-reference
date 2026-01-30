@@ -202,7 +202,7 @@ export function Fretboard() {
             }
 
             return (
-              <div key={stringIndex} className="mb-1 flex items-center">
+              <div key={stringIndex} className="flex items-center">
                 {/* Open note column */}
                 <div
                   className="flex w-14 shrink-0 items-center justify-center"

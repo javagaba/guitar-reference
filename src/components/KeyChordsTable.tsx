@@ -47,13 +47,14 @@ function SectionTable({ section }: { section: TableSection }) {
         {section.subtitle}
       </h3>
       <table className="w-full min-w-[480px] border-collapse text-xs sm:text-sm">
+        <caption className="sr-only">{section.subtitle} chords</caption>
         <thead>
           <tr>
-            <th className="p-2 text-center text-[11px] font-semibold text-subtle">
+            <th scope="col" className="p-2 text-center text-[11px] font-semibold text-subtle">
               Key
             </th>
             {section.numerals.map((num, i) => (
-              <th key={i} className="p-2 text-center text-[10px] font-semibold">
+              <th scope="col" key={i} className="p-2 text-center text-[10px] font-semibold">
                 <RomanNumeral num={num} />
               </th>
             ))}
@@ -75,12 +76,13 @@ function SectionTable({ section }: { section: TableSection }) {
                 }}
                 onClick={() => handleRowClick(row)}
               >
-                <td
+                <th
+                  scope="row"
                   className="p-2 text-center font-mono font-semibold"
                   style={{ color: getNoteColor(row.key) }}
                 >
                   {row.key}
-                </td>
+                </th>
                 {row.chords.map((chord, j) => {
                   const isChordSelected = selectedChord === chord;
                   return (

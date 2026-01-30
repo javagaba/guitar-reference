@@ -78,7 +78,12 @@ export function ChordDisplay() {
   }, [selectedChord, inversions, voicings]);
 
   return (
-    <div className={`collapsible${isOpen ? " collapsible-open" : ""}`}>
+    <div
+      className={`collapsible${isOpen ? " collapsible-open" : ""}`}
+      role="region"
+      aria-live="polite"
+      aria-label="Chord voicing details"
+    >
       <div>
         {isOpen && (
           <Card ref={cardRef} className="mx-auto mt-6 max-w-[1200px]">

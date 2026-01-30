@@ -41,6 +41,15 @@ function accidentalLabel(key: string): string {
   return `${ks.accidentals.length}${symbol}`;
 }
 
+function svgKeyHandler(handler: () => void) {
+  return (e: React.KeyboardEvent) => {
+    if (e.key === "Enter" || e.key === " ") {
+      e.preventDefault();
+      handler();
+    }
+  };
+}
+
 export function CircleOfFifths() {
   const { selectedKey, isMinor, selectedChord, selectKey, selectChord } = useAppContext();
 
@@ -225,7 +234,11 @@ export function CircleOfFifths() {
             return (
               <g
                 key={`maj-${note}`}
+                tabIndex={0}
+                role="button"
+                aria-label={`${note} major`}
                 onClick={() => handleMajorClick(note)}
+                onKeyDown={svgKeyHandler(() => handleMajorClick(note))}
                 style={{ cursor: "pointer", transition: "opacity 0.2s" }}
                 opacity={opacity}
               >
@@ -276,7 +289,11 @@ export function CircleOfFifths() {
             return (
               <g
                 key={`min-${note}`}
+                tabIndex={0}
+                role="button"
+                aria-label={`${note}`}
                 onClick={() => handleMinorClick(note)}
+                onKeyDown={svgKeyHandler(() => handleMinorClick(note))}
                 style={{ cursor: "pointer", transition: "opacity 0.2s" }}
                 opacity={opacity}
               >

@@ -1,15 +1,15 @@
 import { forwardRef } from "react";
 
 export const Card = forwardRef<
-  HTMLDivElement,
-  { children: React.ReactNode; className?: string }
->(function Card({ children, className = "" }, ref) {
+  HTMLElement,
+  { children: React.ReactNode; className?: string; as?: "div" | "section" }
+>(function Card({ children, className = "", as: Tag = "div" }, ref) {
   return (
-    <div
-      ref={ref}
+    <Tag
+      ref={ref as React.Ref<never>}
       className={`rounded-xl border border-border bg-card px-3 py-3 sm:px-4 sm:py-4 ${className}`}
     >
       {children}
-    </div>
+    </Tag>
   );
 });

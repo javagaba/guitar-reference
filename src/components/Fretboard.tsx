@@ -86,12 +86,14 @@ export function Fretboard() {
           <div className="flex rounded-full bg-white/10 p-0.5 font-mono text-xs">
             <button
               onClick={showIntervals ? toggleIntervals : undefined}
+              aria-pressed={!showIntervals}
               className={`rounded-full px-3 py-1 transition-colors ${!showIntervals ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
             >
               Notes
             </button>
             <button
               onClick={!showIntervals ? toggleIntervals : undefined}
+              aria-pressed={showIntervals}
               className={`rounded-full px-3 py-1 transition-colors ${showIntervals ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
             >
               Intervals
@@ -109,6 +111,7 @@ export function Fretboard() {
               <button
                 key={shape}
                 onClick={() => toggleCagedShape(shape)}
+                aria-pressed={active}
                 className={`rounded px-2 py-0.5 font-mono text-xs transition-colors ${
                   active
                     ? "bg-white/20 text-text"

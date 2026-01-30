@@ -83,11 +83,12 @@ export function Metronome() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 z-50 w-56 rounded-lg bg-card border border-border shadow-xl p-3">
+    <div role="region" aria-label="Metronome" className="fixed bottom-4 right-4 z-50 w-56 rounded-lg bg-card border border-border shadow-xl p-3">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[11px] font-medium text-subtle uppercase tracking-wide">Metronome</span>
         <button
           onClick={() => setExpanded(false)}
+          aria-label="Close metronome"
           className="text-subtle hover:text-text text-xs"
         >
           ×
@@ -102,6 +103,7 @@ export function Metronome() {
           max={300}
           value={bpm}
           onChange={(e) => setBpm(Number(e.target.value) || 120)}
+          aria-label="BPM"
           className="w-16 rounded border border-border bg-bg px-2 py-1 font-mono text-sm text-text text-center"
         />
         <span className="text-[11px] text-subtle">BPM</span>
@@ -114,6 +116,7 @@ export function Metronome() {
         max={300}
         value={bpm}
         onChange={(e) => setBpm(Number(e.target.value))}
+        aria-label="BPM slider"
         className="w-full mb-3 accent-blue-500"
       />
 
@@ -124,6 +127,7 @@ export function Metronome() {
           const found = TIME_SIGNATURES.find((ts) => ts.label === e.target.value);
           if (found) setTimeSig(found);
         }}
+        aria-label="Time signature"
         className="w-full rounded border border-border bg-bg px-2 py-1 font-mono text-sm text-text mb-3"
       >
         {TIME_SIGNATURES.map((ts) => (

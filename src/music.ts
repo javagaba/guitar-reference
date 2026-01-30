@@ -741,3 +741,68 @@ export function parseSlashChord(
   if (!chord || !bass) return null;
   return { chord, bass };
 }
+
+// ── Chord name parsing & chord-tone utilities ───────────────────────
+
+export const QUALITY_SUFFIX_MAP: Record<string, string> = {
+  "": "Major",
+  "m": "Minor",
+  "7": "Dominant 7",
+  "maj7": "Major 7",
+  "m7": "Minor 7",
+  "m7♭5": "Half-Dim (m7♭5)",
+  "°": "Diminished",
+  "°7": "Diminished 7",
+  "+": "Augmented",
+  "sus2": "Sus2",
+  "sus4": "Sus4",
+  "6": "6",
+  "m6": "Minor 6",
+  "9": "9",
+  "maj9": "Major 9",
+  "m9": "Minor 9",
+  "add9": "Add9",
+  "5": "Power (5)",
+  "7sus4": "7sus4",
+  "+7": "Aug 7",
+  "mMaj7": "Minor/Major 7",
+};
+
+export function parseChordName(
+  chord: string,
+): { root: string; quality: string } | null {
+  const match = chord.match(/^([A-G][♯♭]?)(.*)/);
+  if (!match) return null;
+  return { root: match[1], quality: match[2] };
+}
+
+export function getChordTones(
+  chordName: string,
+): { notes: string[]; intervals: string[] } | null {
+  const parsed = parseChordName(chordName);
+  if (!parsed) return null;
+
+  const formulaName = QUALITY_SUFFIX_MAP[parsed.quality];
+  if (!formulaName) return null;
+
+  const formula = CHORD_FORMULAS.find((f) => f.name === formulaName);
+  if (!formula) return null;
+
+  const intervals = formula.formula.split(",").map((t) => t.trim());
+  const notes = resolveChordFormula(parsed.root, formula.formula);
+  return { notes, intervals };
+}
+
+export function getChordToneLabel(
+  note: string,
+  chordTones: { notes: string[]; intervals: string[] },
+): string | null {
+  const idx = noteIndex(note);
+  for (let i = 0; i < chordTones.notes.length; i++) {
+    if (noteIndex(chordTones.notes[i]) === idx) {
+      const interval = chordTones.intervals[i];
+      return interval === "1" ? "R" : interval;
+    }
+  }
+  return null;
+}

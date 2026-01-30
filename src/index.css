@@ -95,3 +95,21 @@
 .beat-pulse {
   animation: beat-pulse 150ms ease-out;
 }
+
+/* Long-press fill feedback */
+@keyframes long-press-fill {
+  0% {
+    background-size: 0% 100%;
+  }
+  100% {
+    background-size: 100% 100%;
+  }
+}
+
+.touch-manipulation:active {
+  background-image: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08));
+  background-repeat: no-repeat;
+  background-position: left;
+  background-size: 0% 100%;
+  animation: long-press-fill 500ms ease-out forwards;
+}

@@ -1,8 +1,46 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
+import { playChord } from "../audio";
 import { useAppContext } from "../context/AppContext";
-import { getBorrowedChords, getNoteColor, getSecondaryDominants } from "../music";
+import { useLongPress } from "../hooks/useLongPress";
+import { getBorrowedChords, getChordTones, getNoteColor, getSecondaryDominants } from "../music";
 import { Card } from "./Card";
 import { SectionTitle } from "./SectionTitle";
+
+function ChordPressButton({
+  children,
+  chord,
+  onSelect,
+  className,
+}: {
+  children: React.ReactNode;
+  chord: string;
+  onSelect: (c: string) => void;
+  className: string;
+}) {
+  const handleShortPress = useCallback(() => {
+    const tones = getChordTones(chord);
+    if (tones) playChord(tones.notes);
+  }, [chord]);
+
+  const handleLongPress = useCallback(() => {
+    onSelect(chord);
+  }, [chord, onSelect]);
+
+  const longPressHandlers = useLongPress({
+    onShortPress: handleShortPress,
+    onLongPress: handleLongPress,
+  });
+
+  return (
+    <button
+      className={`${className} select-none touch-manipulation`}
+      title="Tap to play · hold to select"
+      {...longPressHandlers}
+    >
+      {children}
+    </button>
+  );
+}
 
 export function SecondaryAndBorrowed() {
   const { selectedKey, isMinor, selectChord } = useAppContext();
@@ -30,9 +68,10 @@ export function SecondaryAndBorrowed() {
         </div>
         <div className="flex flex-wrap gap-2">
           {secondaryDominants.map((sd) => (
-            <button
+            <ChordPressButton
               key={sd.symbol}
-              onClick={() => selectChord(sd.chord)}
+              chord={sd.chord}
+              onSelect={selectChord}
               className="group flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-xs transition-colors hover:bg-card"
             >
               <span className="text-[10px] text-subtle">{sd.symbol}</span>
@@ -42,7 +81,7 @@ export function SecondaryAndBorrowed() {
               <span className="text-[10px] text-muted">
                 → {sd.resolvesTo}
               </span>
-            </button>
+            </ChordPressButton>
           ))}
         </div>
       </div>
@@ -54,9 +93,10 @@ export function SecondaryAndBorrowed() {
         </div>
         <div className="flex flex-wrap gap-2">
           {borrowedChords.map((bc) => (
-            <button
+            <ChordPressButton
               key={bc.numeral}
-              onClick={() => selectChord(bc.chord)}
+              chord={bc.chord}
+              onSelect={selectChord}
               className="group flex items-center gap-1.5 rounded border border-border px-3 py-1.5 text-xs transition-colors hover:bg-card"
             >
               <span className="text-[10px] text-subtle">{bc.numeral}</span>
@@ -64,7 +104,7 @@ export function SecondaryAndBorrowed() {
                 {bc.chord}
               </span>
               <span className="text-[10px] text-muted">{bc.source}</span>
-            </button>
+            </ChordPressButton>
           ))}
         </div>
       </div>

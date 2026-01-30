@@ -5,6 +5,8 @@ import { useAppContext } from "../context/AppContext";
 import {
   buildFretboardForTuning,
   FRET_MARKERS,
+  getChordToneLabel,
+  getChordTones,
   getDegreeColor,
   getScaleDegree,
   isNoteInScale,
@@ -28,9 +30,19 @@ export function Fretboard() {
     selectedCagedShapes,
     toggleCagedShape,
     setCagedShapes,
+    selectedChord,
   } = useAppContext();
   const hasScale = scaleNotes.length > 0;
   const rootIdx = rootNote ? noteIndex(rootNote) : -1;
+
+  const chordToneInfo = useMemo(
+    () => (selectedChord ? getChordTones(selectedChord) : null),
+    [selectedChord],
+  );
+  const chordRootIdx = useMemo(() => {
+    if (!chordToneInfo || chordToneInfo.notes.length === 0) return -1;
+    return noteIndex(chordToneInfo.notes[0]);
+  }, [chordToneInfo]);
 
   const fretboard = useMemo(
     () => buildFretboardForTuning(selectedTuning.notes),
@@ -148,21 +160,39 @@ export function Fretboard() {
                 const isRoot = hasScale && noteIndex(note) === rootIdx;
 
                 const caged = isInCagedBox(fret);
-                const dimmedByCaged = caged.color !== null && !caged.inBox;
-                const dimmed = hasScale && (!inScale || (selectedCagedShapes.size > 0 && !caged.inBox && inScale));
+                const isChordTone = chordToneInfo
+                  ? getChordToneLabel(note, chordToneInfo) !== null
+                  : false;
+                const isChordRoot = chordToneInfo
+                  ? noteIndex(note) === chordRootIdx
+                  : false;
+                const chordLabel = chordToneInfo
+                  ? getChordToneLabel(note, chordToneInfo)
+                  : null;
+
+                const dimmed = hasScale && (
+                  !inScale ||
+                  (chordToneInfo && inScale && !isChordTone) ||
+                  (selectedCagedShapes.size > 0 && !caged.inBox && inScale)
+                );
 
                 const degree = hasScale
                   ? getScaleDegree(note, scaleNotes)
                   : null;
-                const label =
-                  showIntervals && degree != null
+
+                // When a chord is selected, show chord-tone labels; otherwise scale degrees
+                const label = chordToneInfo && isChordTone
+                  ? chordLabel ?? undefined
+                  : showIntervals && degree != null
                     ? degree === 1
                       ? "R"
                       : String(degree)
                     : undefined;
 
                 let emphasis: "third" | "fifth" | null = null;
-                if (hasScale && inScale && rootIdx >= 0) {
+                if (chordToneInfo && isChordTone && !isChordRoot) {
+                  emphasis = "third";
+                } else if (hasScale && inScale && rootIdx >= 0 && !chordToneInfo) {
                   const semitones =
                     (((noteIndex(note) - rootIdx) % 12) + 12) % 12;
                   if (semitones === 3 || semitones === 4) emphasis = "third";
@@ -187,11 +217,11 @@ export function Fretboard() {
                       note={note}
                       size={28}
                       dimmed={dimmed}
-                      isRoot={isRoot}
+                      isRoot={chordToneInfo ? isChordRoot : isRoot}
                       label={label}
                       emphasis={emphasis}
                       colorOverride={
-                        showIntervals && degree != null
+                        showIntervals && degree != null && !chordToneInfo
                           ? getDegreeColor(degree)
                           : undefined
                       }

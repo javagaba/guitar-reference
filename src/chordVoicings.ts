@@ -1,5 +1,5 @@
 import type { ChordVoicing } from "./types";
-import { noteIndex } from "./music";
+import { noteIndex, parseChordName } from "./music";
 import { VOICING_TEMPLATES } from "./chordVoicingData";
 
 // frets: [lowE, A, D, G, B, highE], -1 = muted, 0 = open
@@ -114,12 +114,6 @@ function transposeTemplate(
   }
 
   return voicing;
-}
-
-function parseChordName(chord: string): { root: string; quality: string } | null {
-  const match = chord.match(/^([A-G][♯♭]?)(.*)/);
-  if (!match) return null;
-  return { root: match[1], quality: match[2] };
 }
 
 // Compute bass note for existing hand-tuned voicings

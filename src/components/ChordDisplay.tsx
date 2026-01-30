@@ -2,10 +2,10 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { useAppContext } from "../context/AppContext";
 import { getChordVoicings } from "../chordVoicings";
 import {
-  CHORD_FORMULAS,
   getChordInversions,
+  getChordTones,
   getNoteColor,
-  resolveChordFormula,
+  parseChordName,
 } from "../music";
 import { isStandardIntervalTuning } from "../tunings";
 import type { VoicingCategory } from "../types";
@@ -22,43 +22,6 @@ const CATEGORY_LABELS: Record<VoicingCategory, string> = {
   drop3: "Drop-3",
   partial: "Partial",
 };
-
-function parseChordRoot(chord: string): string {
-  const match = chord.match(/^([A-G][♯♭]?)/);
-  return match ? match[1] : chord;
-}
-
-function findChordFormula(chord: string): string | null {
-  const root = parseChordRoot(chord);
-  const quality = chord.slice(root.length);
-
-  // Map quality suffix to formula name
-  const qualityMap: Record<string, string> = {
-    "": "Major",
-    "m": "Minor",
-    "7": "Dominant 7",
-    "maj7": "Major 7",
-    "m7": "Minor 7",
-    "m7♭5": "Half-Dim (m7♭5)",
-    "°": "Diminished",
-    "°7": "Diminished 7",
-    "+": "Augmented",
-    "sus2": "Sus2",
-    "sus4": "Sus4",
-    "6": "6",
-    "m6": "Minor 6",
-    "9": "9",
-    "maj9": "Major 9",
-    "m9": "Minor 9",
-    "add9": "Add9",
-    "5": "Power (5)",
-  };
-
-  const formulaName = qualityMap[quality];
-  if (!formulaName) return null;
-  const formula = CHORD_FORMULAS.find((f) => f.name === formulaName);
-  return formula?.formula ?? null;
-}
 
 export function ChordDisplay() {
   const { selectedChord, selectChord, selectedTuning } = useAppContext();
@@ -94,11 +57,11 @@ export function ChordDisplay() {
   // Inversions
   const inversions = useMemo(() => {
     if (!selectedChord) return [];
-    const root = parseChordRoot(selectedChord);
-    const formula = findChordFormula(selectedChord);
-    if (!formula) return [];
-    const notes = resolveChordFormula(root, formula);
-    return getChordInversions(selectedChord, root, notes);
+    const parsed = parseChordName(selectedChord);
+    if (!parsed) return [];
+    const tones = getChordTones(selectedChord);
+    if (!tones) return [];
+    return getChordInversions(selectedChord, parsed.root, tones.notes);
   }, [selectedChord]);
 
   // Get voicings for a specific bass note

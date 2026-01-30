@@ -1,6 +1,7 @@
 import { playChord } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { CHORD_FORMULAS, getNoteColor, resolveChordFormula } from "../music";
+import { Button } from "@/components/ui/button";
 import { Card } from "./Card";
 import { SectionTitle } from "./SectionTitle";
 
@@ -35,13 +36,15 @@ export function ChordFormulas() {
                 {chord.formula}
               </span>
               {resolved && (
-                <button
+                <Button
                   onClick={() => playChord(resolved)}
-                  className="px-2 py-1 -my-1 flex items-center justify-center text-text-dim hover:text-white transition-colors cursor-pointer"
+                  variant="ghost"
+                  size="icon-xs"
+                  className="text-text-dim hover:text-white"
                   title="Play chord"
                 >
                   ▶
-                </button>
+                </Button>
               )}
             </div>
           </div>

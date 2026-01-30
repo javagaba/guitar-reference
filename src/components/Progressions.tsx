@@ -3,6 +3,7 @@ import { playChord } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { useLongPress } from "../hooks/useLongPress";
 import { getChordTones, getNoteColor, PROGRESSIONS, resolveProgression } from "../music";
+import { Button } from "@/components/ui/button";
 import { Card } from "./Card";
 import { SectionTitle } from "./SectionTitle";
 
@@ -22,15 +23,17 @@ function ChordButton({ chord, onSelect }: { chord: string; onSelect: (c: string)
   });
 
   return (
-    <button
+    <Button
       type="button"
-      className="inline-flex select-none touch-manipulation items-center px-1.5 py-1 rounded hover:bg-white/5 hover:brightness-125 cursor-pointer"
+      variant="ghost"
+      size="xs"
+      className="select-none touch-manipulation px-1.5 py-1 hover:bg-white/5 hover:brightness-125"
       style={{ color: getNoteColor(chord) }}
       title="Tap to play · hold to select"
       {...longPressHandlers}
     >
       ({chord})
-    </button>
+    </Button>
   );
 }
 

@@ -3,6 +3,7 @@ import { playChord } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { useLongPress } from "../hooks/useLongPress";
 import { getBorrowedChords, getChordTones, getNoteColor, getSecondaryDominants } from "../music";
+import { Button } from "@/components/ui/button";
 import { Card } from "./Card";
 import { SectionTitle } from "./SectionTitle";
 
@@ -32,13 +33,14 @@ function ChordPressButton({
   });
 
   return (
-    <button
+    <Button
+      variant="ghost"
       className={`${className} select-none touch-manipulation`}
       title="Tap to play · hold to select"
       {...longPressHandlers}
     >
       {children}
-    </button>
+    </Button>
   );
 }
 

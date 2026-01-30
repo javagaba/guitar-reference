@@ -1,5 +1,9 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MetronomeEngine, TIME_SIGNATURES, type TimeSignature } from "../metronome";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { SelectNative } from "@/components/ui/select-native";
+import { Slider } from "@/components/ui/slider";
 
 interface MetronomeProps {
   active: boolean;
@@ -79,56 +83,57 @@ export function Metronome({ active: _active, onClose, onBpmChange }: MetronomePr
     <div role="region" aria-label="Metronome" className="w-56 rounded-lg bg-card border border-border shadow-xl p-3">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[11px] font-medium text-subtle uppercase tracking-wide">Metronome</span>
-        <button
+        <Button
           onClick={onClose}
+          variant="ghost"
+          size="icon-xs"
           aria-label="Close metronome"
-          className="text-subtle hover:text-text text-xs"
+          className="text-subtle hover:text-text"
         >
           x
-        </button>
+        </Button>
       </div>
 
       {/* BPM Display & Input */}
       <div className="flex items-center gap-2 mb-2">
-        <input
+        <Input
           type="number"
           min={30}
           max={300}
           value={bpm}
           onChange={(e) => setBpm(Number(e.target.value) || 120)}
           aria-label="BPM"
-          className="w-16 rounded border border-border bg-bg px-2 py-1 font-mono text-sm text-text text-center"
+          className="w-16 h-7 px-2 font-mono text-sm text-center"
         />
         <span className="text-[11px] text-subtle">BPM</span>
       </div>
 
       {/* Slider */}
-      <input
-        type="range"
+      <Slider
         min={30}
         max={300}
-        value={bpm}
-        onChange={(e) => setBpm(Number(e.target.value))}
+        value={[bpm]}
+        onValueChange={([v]) => setBpm(v)}
         aria-label="BPM slider"
-        className="w-full mb-3 accent-blue-500"
+        className="w-full mb-3"
       />
 
       {/* Time Signature */}
-      <select
+      <SelectNative
         value={timeSig.label}
         onChange={(e) => {
           const found = TIME_SIGNATURES.find((ts) => ts.label === e.target.value);
           if (found) setTimeSig(found);
         }}
         aria-label="Time signature"
-        className="w-full rounded border border-border bg-bg px-2 py-1 font-mono text-sm text-text mb-3"
+        className="w-full font-mono mb-3"
       >
         {TIME_SIGNATURES.map((ts) => (
           <option key={ts.label} value={ts.label}>
             {ts.label}
           </option>
         ))}
-      </select>
+      </SelectNative>
 
       {/* Beat Indicator */}
       <div className="flex justify-center gap-1.5 mb-3">
@@ -148,22 +153,26 @@ export function Metronome({ active: _active, onClose, onBpmChange }: MetronomePr
 
       {/* Controls */}
       <div className="flex gap-2">
-        <button
+        <Button
           onClick={toggle}
-          className={`flex-1 rounded border px-3 py-1.5 font-mono text-xs transition-colors ${
+          variant="outline"
+          size="sm"
+          className={`flex-1 font-mono text-xs ${
             playing
               ? "border-red-500/50 text-red-400 hover:bg-red-900/20"
-              : "border-border text-text hover:bg-white/10"
+              : ""
           }`}
         >
           {playing ? "Stop" : "Play"}
-        </button>
-        <button
+        </Button>
+        <Button
           onClick={handleTap}
-          className="flex-1 rounded border border-border px-3 py-1.5 font-mono text-xs text-subtle hover:bg-white/10 hover:text-text transition-colors"
+          variant="outline"
+          size="sm"
+          className="flex-1 font-mono text-xs text-subtle hover:text-text"
         >
           Tap
-        </button>
+        </Button>
       </div>
     </div>
   );

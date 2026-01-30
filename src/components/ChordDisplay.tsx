@@ -9,6 +9,8 @@ import {
 } from "../music";
 import { isStandardIntervalTuning } from "../tunings";
 import type { VoicingCategory } from "../types";
+import { Button } from "@/components/ui/button";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card } from "./Card";
 import { ChordDiagram } from "./ChordDiagram";
 import { SectionTitle } from "./SectionTitle";
@@ -97,28 +99,37 @@ export function ChordDisplay() {
               </span>
 
               {inversions.length > 0 && (
-                <div className="flex rounded-full bg-white/10 p-0.5 font-mono text-xs">
-                  <button
-                    onClick={() => setTab("voicings")}
-                    className={`rounded-full px-3 py-1 transition-colors ${tab === "voicings" ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
+                <ToggleGroup
+                  type="single"
+                  value={tab}
+                  onValueChange={(val) => {
+                    if (val) setTab(val as "voicings" | "inversions");
+                  }}
+                  className="rounded-full bg-white/10 p-0.5 font-mono text-xs"
+                >
+                  <ToggleGroupItem
+                    value="voicings"
+                    className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-subtle hover:text-text hover:bg-transparent"
                   >
                     Voicings
-                  </button>
-                  <button
-                    onClick={() => setTab("inversions")}
-                    className={`rounded-full px-3 py-1 transition-colors ${tab === "inversions" ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
+                  </ToggleGroupItem>
+                  <ToggleGroupItem
+                    value="inversions"
+                    className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-subtle hover:text-text hover:bg-transparent"
                   >
                     Inversions
-                  </button>
-                </div>
+                  </ToggleGroupItem>
+                </ToggleGroup>
               )}
 
-              <button
+              <Button
                 onClick={() => selectChord(null)}
-                className="rounded border border-border px-3 py-1.5 text-xs text-subtle transition-colors hover:border-subtle hover:text-text"
+                variant="outline"
+                size="sm"
+                className="text-xs"
               >
                 Close
-              </button>
+              </Button>
             </div>
 
             {!isStandard && (

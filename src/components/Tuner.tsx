@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getNoteColor } from "../music";
 import { TunerEngine, STANDARD_TUNING, type TunerResult } from "../tuner";
+import { Button } from "@/components/ui/button";
 
 interface TunerProps {
   active: boolean;
@@ -109,9 +110,14 @@ export function Tuner({ active, onClose }: TunerProps) {
         <span className="text-[11px] font-medium text-subtle uppercase tracking-wide">
           Tuner
         </span>
-        <button onClick={onClose} className="text-subtle hover:text-text text-xs">
+        <Button
+          onClick={onClose}
+          variant="ghost"
+          size="icon-xs"
+          className="text-subtle hover:text-text"
+        >
           x
-        </button>
+        </Button>
       </div>
 
       {error && (

@@ -3,6 +3,8 @@ import { playScale } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { getNoteColor, getScaleTriads, SCALE_DEFINITIONS } from "../music";
 import { TUNINGS } from "../tunings";
+import { Button } from "@/components/ui/button";
+import { SelectNative } from "@/components/ui/select-native";
 import { SectionTitle } from "./SectionTitle";
 
 const CHROMATIC_KEYS = [
@@ -57,7 +59,7 @@ export function ScaleSelector() {
     <div className="mx-auto max-w-[1200px]">
       <SectionTitle>Scale / Mode</SectionTitle>
       <div className="flex flex-wrap items-center gap-4 py-2">
-        <select
+        <SelectNative
           value={selectedKey ?? ""}
           onChange={(e) => {
             const val = e.target.value;
@@ -65,7 +67,7 @@ export function ScaleSelector() {
             else selectKey(null);
           }}
           aria-label="Select key"
-          className="rounded border border-border bg-card px-3 py-2 font-mono text-sm text-text"
+          className="w-auto font-mono"
         >
           <option value="">Key</option>
           {CHROMATIC_KEYS.map((k) => (
@@ -73,13 +75,13 @@ export function ScaleSelector() {
               {k}
             </option>
           ))}
-        </select>
+        </SelectNative>
 
-        <select
+        <SelectNative
           value={selectedScale}
           onChange={(e) => selectScale(e.target.value)}
           aria-label="Select scale"
-          className="rounded border border-border bg-card px-3 py-2 font-mono text-sm text-text"
+          className="w-auto font-mono"
         >
           {categories.map((cat) => (
             <optgroup key={cat} label={cat}>
@@ -90,16 +92,16 @@ export function ScaleSelector() {
               ))}
             </optgroup>
           ))}
-        </select>
+        </SelectNative>
 
-        <select
+        <SelectNative
           value={selectedTuning.name}
           onChange={(e) => {
             const found = TUNINGS.find((t) => t.name === e.target.value);
             if (found) setTuning(found);
           }}
           aria-label="Select tuning"
-          className="rounded border border-border bg-card px-3 py-2 font-mono text-sm text-text"
+          className="w-auto font-mono"
         >
           {tuningCategories.map((cat) => (
             <optgroup key={cat} label={cat}>
@@ -110,27 +112,29 @@ export function ScaleSelector() {
               ))}
             </optgroup>
           ))}
-        </select>
+        </SelectNative>
 
         {selectedKey && (
-          <button
+          <Button
             onClick={() => playScale(scaleNotes)}
-            className="rounded border border-border px-3 py-1 text-xs text-subtle transition-colors active:scale-95 hover:border-subtle hover:text-text"
+            variant="outline"
+            size="sm"
             aria-label="Play scale"
             title="Play scale"
           >
             &#9654;
-          </button>
+          </Button>
         )}
 
         {selectedKey && (
-          <button
+          <Button
             onClick={clearAll}
-            className="rounded border border-border px-3 py-1 text-xs text-subtle transition-colors active:scale-95 hover:border-subtle hover:text-text"
+            variant="outline"
+            size="sm"
             aria-label="Clear selection"
           >
             Clear
-          </button>
+          </Button>
         )}
 
         {triads && (

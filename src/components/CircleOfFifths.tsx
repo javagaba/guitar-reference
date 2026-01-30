@@ -9,6 +9,7 @@ import {
   MAJOR_NUMERALS,
   MINOR_NUMERALS,
 } from "../music";
+import { Button } from "@/components/ui/button";
 import { Card } from "./Card";
 import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
@@ -433,22 +434,26 @@ export function CircleOfFifths() {
             </div>
             <div className="flex flex-wrap gap-1.5">
               {relativeLabel && (
-                <button
+                <Button
                   onClick={() => navigateTo(relativeLabel)}
-                  className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-medium text-text-dim transition-colors hover:border-subtle hover:text-text"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full font-mono text-xs font-medium text-text-dim"
                 >
                   {isMinor ? "Relative Major: " : "Relative Minor: "}
                   {relativeLabel}
-                </button>
+                </Button>
               )}
               {neighborKeys.map((nk) => (
-                <button
+                <Button
                   key={nk}
                   onClick={() => navigateTo(nk)}
-                  className="rounded-full border border-border px-3 py-1.5 font-mono text-xs font-medium text-text-dim transition-colors hover:border-subtle hover:text-text"
+                  variant="outline"
+                  size="sm"
+                  className="rounded-full font-mono text-xs font-medium text-text-dim"
                 >
                   {nk}
-                </button>
+                </Button>
               ))}
             </div>
           </div>

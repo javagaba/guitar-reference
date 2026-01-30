@@ -14,6 +14,9 @@ import {
 } from "../music";
 import { isStandardIntervalTuning } from "../tunings";
 import type { CagedShape } from "../types";
+import { Button } from "@/components/ui/button";
+import { Toggle } from "@/components/ui/toggle";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { Card } from "./Card";
 import { NoteCircle } from "./NoteCircle";
 import { SectionTitle } from "./SectionTitle";
@@ -83,22 +86,29 @@ export function Fretboard() {
       <div className="flex items-center justify-between">
         <SectionTitle>Fretboard</SectionTitle>
         {hasScale && (
-          <div className="flex rounded-full bg-white/10 p-0.5 font-mono text-xs">
-            <button
-              onClick={showIntervals ? toggleIntervals : undefined}
-              aria-pressed={!showIntervals}
-              className={`rounded-full px-3 py-1 transition-colors ${!showIntervals ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
+          <ToggleGroup
+            type="single"
+            value={showIntervals ? "intervals" : "notes"}
+            onValueChange={(val) => {
+              if (val && ((val === "intervals") !== showIntervals)) {
+                toggleIntervals();
+              }
+            }}
+            className="rounded-full bg-white/10 p-0.5 font-mono text-xs"
+          >
+            <ToggleGroupItem
+              value="notes"
+              className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-subtle hover:text-text hover:bg-transparent"
             >
               Notes
-            </button>
-            <button
-              onClick={!showIntervals ? toggleIntervals : undefined}
-              aria-pressed={showIntervals}
-              className={`rounded-full px-3 py-1 transition-colors ${showIntervals ? "bg-white/20 text-text" : "text-subtle hover:text-text"}`}
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="intervals"
+              className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-subtle hover:text-text hover:bg-transparent"
             >
               Intervals
-            </button>
-          </div>
+            </ToggleGroupItem>
+          </ToggleGroup>
         )}
       </div>
 
@@ -108,30 +118,29 @@ export function Fretboard() {
           {ALL_CAGED.map((shape) => {
             const active = selectedCagedShapes.has(shape);
             return (
-              <button
+              <Toggle
                 key={shape}
-                onClick={() => toggleCagedShape(shape)}
-                aria-pressed={active}
-                className={`rounded px-2 py-0.5 font-mono text-xs transition-colors ${
-                  active
-                    ? "bg-white/20 text-text"
-                    : "text-muted hover:text-subtle"
-                }`}
+                pressed={active}
+                onPressedChange={() => toggleCagedShape(shape)}
+                size="sm"
+                className="px-2 py-0.5 h-auto min-w-0 font-mono text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-muted hover:text-subtle hover:bg-transparent"
               >
                 {shape}
-              </button>
+              </Toggle>
             );
           })}
-          <button
+          <Button
             onClick={() =>
               selectedCagedShapes.size === ALL_CAGED.length
                 ? setCagedShapes(new Set())
                 : setCagedShapes(new Set(ALL_CAGED))
             }
-            className="ml-1 rounded px-2 py-0.5 text-[10px] text-subtle hover:text-text"
+            variant="ghost"
+            size="xs"
+            className="ml-1 text-[10px] text-subtle hover:text-text"
           >
             {selectedCagedShapes.size === ALL_CAGED.length ? "None" : "All"}
-          </button>
+          </Button>
         </div>
       )}
 

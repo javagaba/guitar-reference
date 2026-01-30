@@ -1,7 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { getNoteColor } from "../music";
 import { TunerEngine, STANDARD_TUNING, type TunerResult } from "../tuner";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 interface TunerProps {
   active: boolean;
@@ -121,9 +127,9 @@ export function Tuner({ active, onClose }: TunerProps) {
       </div>
 
       {error && (
-        <div className="mb-2 rounded border border-red-500/30 bg-red-900/20 px-2 py-1.5 text-xs text-red-400">
+        <Alert variant="destructive" className="mb-2 px-2 py-1.5 text-xs">
           {error}
-        </div>
+        </Alert>
       )}
 
       {/* Note display */}
@@ -248,31 +254,37 @@ export function Tuner({ active, onClose }: TunerProps) {
           const stringNoteColor = getNoteColor(s.note);
 
           return (
-            <button
-              key={s.string}
-              onClick={() =>
-                setTargetString((prev) =>
-                  prev === s.string ? null : s.string
-                )
-              }
-              className={`flex flex-col items-center rounded px-1.5 py-1 text-[10px] font-mono transition-all ${
-                isTarget
-                  ? "bg-white/10 ring-1 ring-white/30"
-                  : isHighlighted
-                    ? "bg-white/5"
-                    : "hover:bg-white/5"
-              }`}
-              style={{
-                color: isHighlighted ? stringNoteColor : "rgba(255,255,255,0.4)",
-              }}
-              title={`String ${s.string}: ${s.note}${s.octave} (${s.freq} Hz)`}
-            >
-              <span className="font-semibold text-xs leading-none">
-                {s.note}
-                <sub className="text-[8px] opacity-60">{s.octave}</sub>
-              </span>
-              <span className="text-[8px] opacity-50">{s.string}</span>
-            </button>
+            <Tooltip key={s.string}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="ghost"
+                  onClick={() =>
+                    setTargetString((prev) =>
+                      prev === s.string ? null : s.string
+                    )
+                  }
+                  className={`flex flex-col items-center h-auto rounded px-1.5 py-1 text-[10px] font-mono ${
+                    isTarget
+                      ? "bg-white/10 ring-1 ring-white/30"
+                      : isHighlighted
+                        ? "bg-white/5"
+                        : "hover:bg-white/5"
+                  }`}
+                  style={{
+                    color: isHighlighted ? stringNoteColor : "rgba(255,255,255,0.4)",
+                  }}
+                >
+                  <span className="font-semibold text-xs leading-none">
+                    {s.note}
+                    <sub className="text-[8px] opacity-60">{s.octave}</sub>
+                  </span>
+                  <span className="text-[8px] opacity-50">{s.string}</span>
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                String {s.string}: {s.note}{s.octave} ({s.freq} Hz)
+              </TooltipContent>
+            </Tooltip>
           );
         })}
       </div>

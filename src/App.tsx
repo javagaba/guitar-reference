@@ -1,7 +1,7 @@
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
 import { MatrixBackground } from "./components/MatrixBackground";
-import { ToolsTray } from "./components/ToolsTray";
 import { ScaleSelector } from "./components/ScaleSelector";
+import { ToolsTray } from "./components/ToolsTray";
 import { AppProvider } from "./context/AppContext";
 import { HomePage } from "./pages/HomePage";
 import { ReferencePage } from "./pages/ReferencePage";
@@ -20,7 +20,7 @@ export default function App() {
       <AppProvider>
         <MatrixBackground />
         <div className="relative z-10 min-h-screen bg-transparent px-4 pb-8 font-sans text-text sm:px-8">
-          <header className="sticky top-0 z-50 bg-bg border-b border-border/50 py-4 -mx-4 px-4 sm:-mx-8 sm:px-8">
+          <header className="sticky top-0 z-50 bg-bg border-b border-border/50 py-2 -mx-4 px-4 sm:-mx-8 sm:px-8">
             <h1 className="sr-only">Guitar Reference</h1>
             <nav className="mx-auto mb-4 flex max-w-[1200px] gap-2">
               <NavLink to="/" end className={navClass}>

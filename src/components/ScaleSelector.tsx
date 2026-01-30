@@ -1,10 +1,10 @@
+import { Button } from "@/components/ui/button";
+import { SelectNative } from "@/components/ui/select-native";
 import { useMemo } from "react";
 import { playScale } from "../audio";
 import { useAppContext } from "../context/AppContext";
 import { getNoteColor, getScaleTriads, SCALE_DEFINITIONS } from "../music";
 import { TUNINGS } from "../tunings";
-import { Button } from "@/components/ui/button";
-import { SelectNative } from "@/components/ui/select-native";
 import { SectionTitle } from "./SectionTitle";
 
 const CHROMATIC_KEYS = [
@@ -58,7 +58,7 @@ export function ScaleSelector() {
   return (
     <div className="mx-auto max-w-[1200px]">
       <SectionTitle>Scale / Mode</SectionTitle>
-      <div className="flex flex-wrap items-center gap-4 py-2">
+      <div className="flex flex-wrap items-center gap-4">
         <SelectNative
           value={selectedKey ?? ""}
           onChange={(e) => {

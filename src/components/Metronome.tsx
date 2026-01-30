@@ -9,9 +9,11 @@ interface MetronomeProps {
   active: boolean;
   onClose: () => void;
   onBpmChange?: (bpm: number) => void;
+  onPlayingChange?: (playing: boolean) => void;
+  onBeat?: (beat: number) => void;
 }
 
-export function Metronome({ active: _active, onClose, onBpmChange }: MetronomeProps) {
+export function Metronome({ active: _active, onClose, onBpmChange, onPlayingChange, onBeat: onBeatExternal }: MetronomeProps) {
   const [bpm, setBpm] = useState(120);
   const [timeSig, setTimeSig] = useState<TimeSignature>(TIME_SIGNATURES[0]);
   const [playing, setPlaying] = useState(false);
@@ -40,7 +42,8 @@ export function Metronome({ active: _active, onClose, onBpmChange }: MetronomePr
 
   const handleBeat = useCallback((beat: number) => {
     setCurrentBeat(beat);
-  }, []);
+    onBeatExternal?.(beat);
+  }, [onBeatExternal]);
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -55,9 +58,11 @@ export function Metronome({ active: _active, onClose, onBpmChange }: MetronomePr
       engine.stop();
       setPlaying(false);
       setCurrentBeat(-1);
+      onPlayingChange?.(false);
     } else {
       engine.start();
       setPlaying(true);
+      onPlayingChange?.(true);
     }
   }
 

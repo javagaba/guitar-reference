@@ -9,8 +9,9 @@ import {
 } from "../music";
 import { isStandardIntervalTuning } from "../tunings";
 import type { VoicingCategory } from "../types";
+import { Alert } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card } from "./Card";
 import { ChordDiagram } from "./ChordDiagram";
 import { SectionTitle } from "./SectionTitle";
@@ -90,56 +91,49 @@ export function ChordDisplay() {
         {isOpen && (
           <Card ref={cardRef} className="mx-auto mt-6 max-w-[1200px]">
             <SectionTitle>Chord Voicing</SectionTitle>
-            <div className="flex items-center gap-3 pb-1 pt-2">
-              <span
-                className="font-mono text-lg font-bold"
-                style={{ color: getNoteColor(selectedChord!) }}
-              >
-                {selectedChord}
-              </span>
-
-              {inversions.length > 0 && (
-                <ToggleGroup
-                  type="single"
-                  value={tab}
-                  onValueChange={(val) => {
-                    if (val) setTab(val as "voicings" | "inversions");
-                  }}
-                  className="rounded-full bg-white/10 p-0.5 font-mono text-xs"
+            <Tabs value={tab} onValueChange={(val) => setTab(val as "voicings" | "inversions")}>
+              <div className="flex items-center gap-3 pb-1 pt-2">
+                <span
+                  className="font-mono text-lg font-bold"
+                  style={{ color: getNoteColor(selectedChord!) }}
                 >
-                  <ToggleGroupItem
-                    value="voicings"
-                    className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-subtle hover:text-text hover:bg-transparent"
-                  >
-                    Voicings
-                  </ToggleGroupItem>
-                  <ToggleGroupItem
-                    value="inversions"
-                    className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=on]:bg-white/20 data-[state=on]:text-text text-subtle hover:text-text hover:bg-transparent"
-                  >
-                    Inversions
-                  </ToggleGroupItem>
-                </ToggleGroup>
+                  {selectedChord}
+                </span>
+
+                {inversions.length > 0 && (
+                  <TabsList className="rounded-full bg-white/10 p-0.5 font-mono text-xs h-auto">
+                    <TabsTrigger
+                      value="voicings"
+                      className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=active]:bg-white/20 data-[state=active]:text-text text-subtle hover:text-text border-none shadow-none"
+                    >
+                      Voicings
+                    </TabsTrigger>
+                    <TabsTrigger
+                      value="inversions"
+                      className="rounded-full px-3 py-1 h-auto min-w-0 text-xs data-[state=active]:bg-white/20 data-[state=active]:text-text text-subtle hover:text-text border-none shadow-none"
+                    >
+                      Inversions
+                    </TabsTrigger>
+                  </TabsList>
+                )}
+
+                <Button
+                  onClick={() => selectChord(null)}
+                  variant="outline"
+                  size="sm"
+                  className="text-xs"
+                >
+                  Close
+                </Button>
+              </div>
+
+              {!isStandard && (
+                <Alert variant="warning" className="mb-2 px-3 py-1.5 text-xs">
+                  Voicings shown are for standard tuning
+                </Alert>
               )}
 
-              <Button
-                onClick={() => selectChord(null)}
-                variant="outline"
-                size="sm"
-                className="text-xs"
-              >
-                Close
-              </Button>
-            </div>
-
-            {!isStandard && (
-              <div className="mb-2 rounded bg-yellow-900/20 px-3 py-1.5 text-xs text-yellow-400/80">
-                Voicings shown are for standard tuning
-              </div>
-            )}
-
-            {tab === "voicings" && (
-              <>
+              <TabsContent value="voicings">
                 {voicings.length > 0 ? (
                   grouped.size > 1 ? (
                     // Multiple categories: show grouped
@@ -182,44 +176,44 @@ export function ChordDisplay() {
                     No voicing data available for {selectedChord}
                   </div>
                 )}
-              </>
-            )}
+              </TabsContent>
 
-            {tab === "inversions" && (
-              <div className="space-y-4 py-3">
-                {inversions.map((inv) => {
-                  const matchingVoicings = inversionVoicings.get(inv.bassNote) ?? [];
-                  return (
-                    <div key={inv.inversionNumber}>
-                      <div className="mb-1 flex items-center gap-3">
-                        <span className="font-mono text-sm font-medium text-text">
-                          {inv.slashNotation}
-                        </span>
-                        <span className="text-[11px] text-subtle">{inv.label}</span>
-                        <span className="text-[11px] text-muted">
-                          Bass: {inv.bassNote}
-                        </span>
-                      </div>
-                      <div className="text-[11px] text-subtle mb-2">
-                        {inv.notes.join(" - ")}
-                      </div>
-                      {matchingVoicings.length > 0 && (
-                        <div className="flex gap-3 sm:gap-6 overflow-x-auto">
-                          {matchingVoicings.map((v, i) => (
-                            <div key={i} className="flex flex-col items-center gap-1">
-                              <ChordDiagram voicing={v} highlightBass={inv.bassNote} />
-                              <span className="text-[9px] text-subtle">
-                                {v.label ?? (v.baseFret > 1 ? `Fret ${v.baseFret}` : "")}
-                              </span>
-                            </div>
-                          ))}
+              <TabsContent value="inversions">
+                <div className="space-y-4 py-3">
+                  {inversions.map((inv) => {
+                    const matchingVoicings = inversionVoicings.get(inv.bassNote) ?? [];
+                    return (
+                      <div key={inv.inversionNumber}>
+                        <div className="mb-1 flex items-center gap-3">
+                          <span className="font-mono text-sm font-medium text-text">
+                            {inv.slashNotation}
+                          </span>
+                          <span className="text-[11px] text-subtle">{inv.label}</span>
+                          <span className="text-[11px] text-muted">
+                            Bass: {inv.bassNote}
+                          </span>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
-              </div>
-            )}
+                        <div className="text-[11px] text-subtle mb-2">
+                          {inv.notes.join(" - ")}
+                        </div>
+                        {matchingVoicings.length > 0 && (
+                          <div className="flex gap-3 sm:gap-6 overflow-x-auto">
+                            {matchingVoicings.map((v, i) => (
+                              <div key={i} className="flex flex-col items-center gap-1">
+                                <ChordDiagram voicing={v} highlightBass={inv.bassNote} />
+                                <span className="text-[9px] text-subtle">
+                                  {v.label ?? (v.baseFret > 1 ? `Fret ${v.baseFret}` : "")}
+                                </span>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </TabsContent>
+            </Tabs>
           </Card>
         )}
       </div>

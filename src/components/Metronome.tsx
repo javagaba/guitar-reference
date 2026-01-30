@@ -1,8 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MetronomeEngine, TIME_SIGNATURES, type TimeSignature } from "../metronome";
 
-export function Metronome() {
-  const [expanded, setExpanded] = useState(false);
+interface MetronomeProps {
+  active: boolean;
+  onClose: () => void;
+  onBpmChange?: (bpm: number) => void;
+}
+
+export function Metronome({ active: _active, onClose, onBpmChange }: MetronomeProps) {
   const [bpm, setBpm] = useState(120);
   const [timeSig, setTimeSig] = useState<TimeSignature>(TIME_SIGNATURES[0]);
   const [playing, setPlaying] = useState(false);
@@ -20,7 +25,8 @@ export function Metronome() {
     const engine = engineRef.current;
     if (!engine) return;
     engine.bpm = bpm;
-  }, [bpm]);
+    onBpmChange?.(bpm);
+  }, [bpm, onBpmChange]);
 
   useEffect(() => {
     const engine = engineRef.current;
@@ -55,7 +61,6 @@ export function Metronome() {
     const now = performance.now();
     const taps = tapTimesRef.current;
     taps.push(now);
-    // Keep last 6 taps
     if (taps.length > 6) taps.shift();
     if (taps.length >= 2) {
       const intervals: number[] = [];
@@ -70,28 +75,16 @@ export function Metronome() {
     }
   }
 
-  if (!expanded) {
-    return (
-      <button
-        onClick={() => setExpanded(true)}
-        className="fixed bottom-4 right-4 z-50 flex h-12 w-12 items-center justify-center rounded-full bg-card border border-border shadow-lg text-xs font-mono text-text hover:bg-white/10 transition-colors"
-        title="Metronome"
-      >
-        {bpm}
-      </button>
-    );
-  }
-
   return (
-    <div role="region" aria-label="Metronome" className="fixed bottom-4 right-4 z-50 w-56 rounded-lg bg-card border border-border shadow-xl p-3">
+    <div role="region" aria-label="Metronome" className="w-56 rounded-lg bg-card border border-border shadow-xl p-3">
       <div className="flex items-center justify-between mb-3">
         <span className="text-[11px] font-medium text-subtle uppercase tracking-wide">Metronome</span>
         <button
-          onClick={() => setExpanded(false)}
+          onClick={onClose}
           aria-label="Close metronome"
           className="text-subtle hover:text-text text-xs"
         >
-          ×
+          x
         </button>
       </div>
 

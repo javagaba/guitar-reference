@@ -1,6 +1,5 @@
 import { BrowserRouter, NavLink, Route, Routes } from "react-router-dom";
-import { Metronome } from "./components/Metronome";
-import { Tuner } from "./components/Tuner";
+import { ToolsTray } from "./components/ToolsTray";
 import { ScaleSelector } from "./components/ScaleSelector";
 import { AppProvider } from "./context/AppContext";
 import { HomePage } from "./pages/HomePage";
@@ -39,8 +38,7 @@ export default function App() {
             </Routes>
           </main>
         </div>
-        <Metronome />
-        <Tuner />
+        <ToolsTray />
       </AppProvider>
     </BrowserRouter>
   );

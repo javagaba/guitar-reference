@@ -1,3 +1,12 @@
+export const STANDARD_TUNING = [
+  { string: 6, note: "E", octave: 2, freq: 82.41 },
+  { string: 5, note: "A", octave: 2, freq: 110.0 },
+  { string: 4, note: "D", octave: 3, freq: 146.83 },
+  { string: 3, note: "G", octave: 3, freq: 196.0 },
+  { string: 2, note: "B", octave: 3, freq: 246.94 },
+  { string: 1, note: "E", octave: 4, freq: 329.63 },
+] as const;
+
 export interface TunerResult {
   frequency: number;
   note: string;

@@ -112,6 +112,25 @@
   }
 }
 
+.tuner-needle {
+  transition: x1 0.1s ease-out, y1 0.1s ease-out, x2 0.1s ease-out, y2 0.1s ease-out, stroke 0.15s ease;
+}
+
+@keyframes tuner-glow-pulse {
+  0%, 100% {
+    opacity: 0.3;
+    r: 5;
+  }
+  50% {
+    opacity: 0.6;
+    r: 8;
+  }
+}
+
+.tuner-glow {
+  animation: tuner-glow-pulse 1.2s ease-in-out infinite;
+}
+
 .touch-manipulation:active {
   background-image: linear-gradient(rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.08));
   background-repeat: no-repeat;

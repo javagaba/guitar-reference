@@ -58,10 +58,18 @@ export function Fretboard() {
     return getCagedBoxesForKey(rootNote);
   }, [rootNote, isStandard, selectedCagedShapes]);
 
-  function isInCagedBox(fret: number): { inBox: boolean; color: string | null } {
-    if (!cagedBoxes || selectedCagedShapes.size === 0) return { inBox: false, color: null };
+  function isInCagedBox(fret: number): {
+    inBox: boolean;
+    color: string | null;
+  } {
+    if (!cagedBoxes || selectedCagedShapes.size === 0)
+      return { inBox: false, color: null };
     for (const box of cagedBoxes) {
-      if (selectedCagedShapes.has(box.shape) && fret >= box.lowFret && fret <= box.highFret) {
+      if (
+        selectedCagedShapes.has(box.shape) &&
+        fret >= box.lowFret &&
+        fret <= box.highFret
+      ) {
         return { inBox: true, color: box.color };
       }
     }
@@ -124,7 +132,7 @@ export function Fretboard() {
         </div>
       )}
 
-      <div className="overflow-x-auto py-4">
+      <div className="overflow-x-auto">
         <div className="min-w-200">
           {/* Fret numbers */}
           <div className="mb-2 flex items-center">
@@ -160,24 +168,35 @@ export function Fretboard() {
             const openChordLabel = chordToneInfo
               ? getChordToneLabel(openNote, chordToneInfo)
               : null;
-            const openDimmed = hasScale && (
-              !openInScale ||
-              (chordToneInfo && openInScale && !openIsChordTone) ||
-              (selectedCagedShapes.size > 0 && !openCaged.inBox && openInScale)
-            );
+            const openDimmed =
+              hasScale &&
+              (!openInScale ||
+                (chordToneInfo && openInScale && !openIsChordTone) ||
+                (selectedCagedShapes.size > 0 &&
+                  !openCaged.inBox &&
+                  openInScale));
             const openDegree = hasScale
               ? getScaleDegree(openNote, scaleNotes)
               : null;
-            const openLabel = chordToneInfo && openIsChordTone
-              ? openChordLabel ?? undefined
-              : showIntervals && openDegree != null
-                ? openDegree === 1 ? "R" : String(openDegree)
-                : undefined;
+            const openLabel =
+              chordToneInfo && openIsChordTone
+                ? (openChordLabel ?? undefined)
+                : showIntervals && openDegree != null
+                  ? openDegree === 1
+                    ? "R"
+                    : String(openDegree)
+                  : undefined;
             let openEmphasis: "third" | "fifth" | null = null;
             if (chordToneInfo && openIsChordTone && !openIsChordRoot) {
               openEmphasis = "third";
-            } else if (hasScale && openInScale && rootIdx >= 0 && !chordToneInfo) {
-              const semitones = (((noteIndex(openNote) - rootIdx) % 12) + 12) % 12;
+            } else if (
+              hasScale &&
+              openInScale &&
+              rootIdx >= 0 &&
+              !chordToneInfo
+            ) {
+              const semitones =
+                (((noteIndex(openNote) - rootIdx) % 12) + 12) % 12;
               if (semitones === 3 || semitones === 4) openEmphasis = "third";
               else if (semitones === 7) openEmphasis = "fifth";
             }
@@ -223,28 +242,36 @@ export function Fretboard() {
                     ? getChordToneLabel(note, chordToneInfo)
                     : null;
 
-                  const dimmed = hasScale && (
-                    !inScale ||
-                    (chordToneInfo && inScale && !isChordTone) ||
-                    (selectedCagedShapes.size > 0 && !caged.inBox && inScale)
-                  );
+                  const dimmed =
+                    hasScale &&
+                    (!inScale ||
+                      (chordToneInfo && inScale && !isChordTone) ||
+                      (selectedCagedShapes.size > 0 &&
+                        !caged.inBox &&
+                        inScale));
 
                   const degree = hasScale
                     ? getScaleDegree(note, scaleNotes)
                     : null;
 
-                  const label = chordToneInfo && isChordTone
-                    ? chordLabel ?? undefined
-                    : showIntervals && degree != null
-                      ? degree === 1
-                        ? "R"
-                        : String(degree)
-                      : undefined;
+                  const label =
+                    chordToneInfo && isChordTone
+                      ? (chordLabel ?? undefined)
+                      : showIntervals && degree != null
+                        ? degree === 1
+                          ? "R"
+                          : String(degree)
+                        : undefined;
 
                   let emphasis: "third" | "fifth" | null = null;
                   if (chordToneInfo && isChordTone && !isChordRoot) {
                     emphasis = "third";
-                  } else if (hasScale && inScale && rootIdx >= 0 && !chordToneInfo) {
+                  } else if (
+                    hasScale &&
+                    inScale &&
+                    rootIdx >= 0 &&
+                    !chordToneInfo
+                  ) {
                     const semitones =
                       (((noteIndex(note) - rootIdx) % 12) + 12) % 12;
                     if (semitones === 3 || semitones === 4) emphasis = "third";
@@ -257,11 +284,12 @@ export function Fretboard() {
                       className="flex w-14 justify-center py-1"
                       style={{
                         borderLeft: "1px solid #333",
-                        backgroundColor: caged.inBox && inScale
-                          ? caged.color!
-                          : FRET_MARKERS.includes(fret)
-                            ? "rgba(255,255,255,0.02)"
-                            : "transparent",
+                        backgroundColor:
+                          caged.inBox && inScale
+                            ? caged.color!
+                            : FRET_MARKERS.includes(fret)
+                              ? "rgba(255,255,255,0.02)"
+                              : "transparent",
                       }}
                     >
                       <NoteCircle
@@ -277,7 +305,9 @@ export function Fretboard() {
                             : undefined
                         }
                         onClick={() =>
-                          playNoteAtMidi(selectedTuning.midiNotes[stringIndex] + fret)
+                          playNoteAtMidi(
+                            selectedTuning.midiNotes[stringIndex] + fret,
+                          )
                         }
                       />
                     </div>

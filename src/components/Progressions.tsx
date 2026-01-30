@@ -1,6 +1,6 @@
 import { useCallback } from "react";
 import { playChord } from "../audio";
-import { useAppContext } from "../context/AppContext";
+import { useAppStore } from "../stores/appStore";
 import { useLongPress } from "../hooks/useLongPress";
 import { getChordTones, getNoteColor, PROGRESSIONS, resolveProgression } from "../music";
 import { Button } from "@/components/ui/button";
@@ -38,7 +38,8 @@ function ChordButton({ chord, onSelect }: { chord: string; onSelect: (c: string)
 }
 
 export function Progressions() {
-  const { selectedKey, selectChord } = useAppContext();
+  const selectedKey = useAppStore((s) => s.selectedKey);
+  const selectChord = useAppStore((s) => s.selectChord);
 
   return (
     <Card>

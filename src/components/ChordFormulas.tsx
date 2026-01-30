@@ -1,12 +1,12 @@
 import { playChord } from "../audio";
-import { useAppContext } from "../context/AppContext";
+import { useAppStore } from "../stores/appStore";
 import { CHORD_FORMULAS, getNoteColor, resolveChordFormula } from "../music";
 import { Button } from "@/components/ui/button";
 import { Card } from "./Card";
 import { SectionTitle } from "./SectionTitle";
 
 export function ChordFormulas() {
-  const { selectedKey } = useAppContext();
+  const selectedKey = useAppStore((s) => s.selectedKey);
 
   return (
     <Card>

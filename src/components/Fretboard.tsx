@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { playNoteAtMidi } from "../audio";
 import { getCagedBoxesForKey } from "../cagedPatterns";
-import { useAppContext } from "../context/AppContext";
+import { getInstrument } from "../instruments";
 import {
   buildFretboardForTuning,
   FRET_MARKERS,
@@ -12,7 +12,7 @@ import {
   isNoteInScale,
   noteIndex,
 } from "../music";
-import { isStandardIntervalTuning } from "../tunings";
+import { useAppStore, useIsStandardIntervalTuning, useSelectedTuning } from "../stores/appStore";
 import type { CagedShape } from "../types";
 import { Button } from "@/components/ui/button";
 import { Toggle } from "@/components/ui/toggle";
@@ -24,17 +24,20 @@ import { SectionTitle } from "./SectionTitle";
 const ALL_CAGED: CagedShape[] = ["C", "A", "G", "E", "D"];
 
 export function Fretboard() {
-  const {
-    scaleNotes,
-    rootNote,
-    showIntervals,
-    toggleIntervals,
-    selectedTuning,
-    selectedCagedShapes,
-    toggleCagedShape,
-    setCagedShapes,
-    selectedChord,
-  } = useAppContext();
+  const scaleNotes = useAppStore((s) => s.scaleNotes);
+  const rootNote = useAppStore((s) => s.rootNote);
+  const showIntervals = useAppStore((s) => s.showIntervals);
+  const toggleIntervals = useAppStore((s) => s.toggleIntervals);
+  const instrumentId = useAppStore((s) => s.instrumentId);
+  const selectedCagedShapes = useAppStore((s) => s.selectedCagedShapes);
+  const toggleCagedShape = useAppStore((s) => s.toggleCagedShape);
+  const setCagedShapes = useAppStore((s) => s.setCagedShapes);
+  const selectedChord = useAppStore((s) => s.selectedChord);
+
+  const selectedTuning = useSelectedTuning();
+  const isStandard = useIsStandardIntervalTuning();
+  const instrument = getInstrument(instrumentId);
+
   const hasScale = scaleNotes.length > 0;
   const rootIdx = rootNote ? noteIndex(rootNote) : -1;
 
@@ -48,12 +51,13 @@ export function Fretboard() {
   }, [chordToneInfo]);
 
   const fretboard = useMemo(
-    () => buildFretboardForTuning(selectedTuning.notes),
-    [selectedTuning],
+    () => buildFretboardForTuning(selectedTuning.notes, instrument.defaultFrets),
+    [selectedTuning, instrument.defaultFrets],
   );
-  const isStandard = useMemo(
-    () => isStandardIntervalTuning(selectedTuning),
-    [selectedTuning],
+
+  const fretMarkers = useMemo(
+    () => FRET_MARKERS.filter((f) => f <= instrument.defaultFrets),
+    [instrument.defaultFrets],
   );
 
   const cagedBoxes = useMemo(() => {
@@ -79,12 +83,12 @@ export function Fretboard() {
     return { inBox: false, color: null };
   }
 
-  const showCagedControls = hasScale && isStandard;
+  const showCagedControls = hasScale && isStandard && instrument.supportsCaged;
 
   return (
     <Card className="mx-auto mt-6 max-w-300">
       <div className="flex items-center justify-between">
-        <SectionTitle>Fretboard</SectionTitle>
+        <SectionTitle>{instrument.label} [{selectedTuning.name}]</SectionTitle>
         {hasScale && (
           <ToggleGroup
             type="single"
@@ -155,7 +159,7 @@ export function Fretboard() {
                 <div
                   key={fret}
                   className={`w-14 text-center font-mono text-xs ${
-                    FRET_MARKERS.includes(fret) ? "text-subtle" : "text-[#555]"
+                    fretMarkers.includes(fret) ? "text-subtle" : "text-[#555]"
                   }`}
                   style={{ borderLeft: "1px solid transparent" }}
                 >
@@ -299,7 +303,7 @@ export function Fretboard() {
                         backgroundColor:
                           caged.inBox && inScale
                             ? caged.color!
-                            : FRET_MARKERS.includes(fret)
+                            : fretMarkers.includes(fret)
                               ? "rgba(255,255,255,0.02)"
                               : "transparent",
                       }}
@@ -342,7 +346,7 @@ export function Fretboard() {
                 >
                   {fret === 12 || fret === 24
                     ? "••"
-                    : FRET_MARKERS.includes(fret)
+                    : fretMarkers.includes(fret)
                       ? "•"
                       : ""}
                 </div>

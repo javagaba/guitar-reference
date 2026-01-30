@@ -1,6 +1,6 @@
 import { useCallback, useMemo } from "react";
 import { playChord } from "../audio";
-import { useAppContext } from "../context/AppContext";
+import { useAppStore } from "../stores/appStore";
 import { useLongPress } from "../hooks/useLongPress";
 import { getBorrowedChords, getChordTones, getNoteColor, getSecondaryDominants } from "../music";
 import { Button } from "@/components/ui/button";
@@ -45,7 +45,9 @@ function ChordPressButton({
 }
 
 export function SecondaryAndBorrowed() {
-  const { selectedKey, isMinor, selectChord } = useAppContext();
+  const selectedKey = useAppStore((s) => s.selectedKey);
+  const isMinor = useAppStore((s) => s.isMinor);
+  const selectChord = useAppStore((s) => s.selectChord);
 
   const secondaryDominants = useMemo(() => {
     if (!selectedKey) return [];

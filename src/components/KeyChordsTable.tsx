@@ -1,4 +1,4 @@
-import { useAppContext } from "../context/AppContext";
+import { useAppStore } from "../stores/appStore";
 import { getNoteColor } from "../music";
 import type { KeyChords } from "../types";
 import { Card } from "./Card";
@@ -22,8 +22,11 @@ interface TableSection {
 }
 
 function SectionTable({ section }: { section: TableSection }) {
-  const { selectedKey, isMinor, selectedChord, selectKey, selectChord } =
-    useAppContext();
+  const selectedKey = useAppStore((s) => s.selectedKey);
+  const isMinor = useAppStore((s) => s.isMinor);
+  const selectedChord = useAppStore((s) => s.selectedChord);
+  const selectKey = useAppStore((s) => s.selectKey);
+  const selectChord = useAppStore((s) => s.selectChord);
 
   function isSelectedRow(row: KeyChords): boolean {
     if (!selectedKey) return false;

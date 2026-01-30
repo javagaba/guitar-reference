@@ -1,4 +1,4 @@
-import { useAppContext } from "../context/AppContext";
+import { useAppStore } from "../stores/appStore";
 import {
   CIRCLE_MAJOR,
   CIRCLE_MINOR,
@@ -52,7 +52,11 @@ function svgKeyHandler(handler: () => void) {
 }
 
 export function CircleOfFifths() {
-  const { selectedKey, isMinor, selectedChord, selectKey, selectChord } = useAppContext();
+  const selectedKey = useAppStore((s) => s.selectedKey);
+  const isMinor = useAppStore((s) => s.isMinor);
+  const selectedChord = useAppStore((s) => s.selectedChord);
+  const selectKey = useAppStore((s) => s.selectKey);
+  const selectChord = useAppStore((s) => s.selectChord);
 
   // Derive relationship data for the selected key
   const selectedMajorIdx = selectedKey

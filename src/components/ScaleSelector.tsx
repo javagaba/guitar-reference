@@ -2,9 +2,8 @@ import { Button } from "@/components/ui/button";
 import { SelectNative } from "@/components/ui/select-native";
 import { useMemo } from "react";
 import { playScale } from "../audio";
-import { useAppContext } from "../context/AppContext";
 import { getNoteColor, getScaleTriads, SCALE_DEFINITIONS } from "../music";
-import { TUNINGS } from "../tunings";
+import { useAppStore } from "../stores/appStore";
 import { SectionTitle } from "./SectionTitle";
 
 const CHROMATIC_KEYS = [
@@ -32,21 +31,15 @@ const categories = [
   "Exotic",
 ] as const;
 
-const tuningCategories = ["Standard", "Drop", "Open", "Other"] as const;
-
 export function ScaleSelector() {
-  const {
-    selectedKey,
-    selectedScale,
-    selectedChord,
-    scaleNotes,
-    selectedTuning,
-    selectKey,
-    selectScale,
-    selectChord,
-    setTuning,
-    clearAll,
-  } = useAppContext();
+  const selectedKey = useAppStore((s) => s.selectedKey);
+  const selectedScale = useAppStore((s) => s.selectedScale);
+  const selectedChord = useAppStore((s) => s.selectedChord);
+  const scaleNotes = useAppStore((s) => s.scaleNotes);
+  const selectKey = useAppStore((s) => s.selectKey);
+  const selectScale = useAppStore((s) => s.selectScale);
+  const selectChord = useAppStore((s) => s.selectChord);
+  const clearAll = useAppStore((s) => s.clearAll);
 
   const def = SCALE_DEFINITIONS.find((s) => s.name === selectedScale);
 
@@ -88,26 +81,6 @@ export function ScaleSelector() {
               {SCALE_DEFINITIONS.filter((s) => s.category === cat).map((s) => (
                 <option key={s.name} value={s.name}>
                   {s.name}
-                </option>
-              ))}
-            </optgroup>
-          ))}
-        </SelectNative>
-
-        <SelectNative
-          value={selectedTuning.name}
-          onChange={(e) => {
-            const found = TUNINGS.find((t) => t.name === e.target.value);
-            if (found) setTuning(found);
-          }}
-          aria-label="Select tuning"
-          className="w-auto font-mono"
-        >
-          {tuningCategories.map((cat) => (
-            <optgroup key={cat} label={cat}>
-              {TUNINGS.filter((t) => t.category === cat).map((t) => (
-                <option key={t.name} value={t.name}>
-                  {t.name} ({[...t.notes].reverse().join("")})
                 </option>
               ))}
             </optgroup>

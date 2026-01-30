@@ -102,11 +102,11 @@ function buildFretboard(): string[][] {
   });
 }
 
-export function buildFretboardForTuning(tuningNotes: string[]): string[][] {
+export function buildFretboardForTuning(tuningNotes: string[], numFrets: number = NUM_FRETS): string[][] {
   return tuningNotes.map((open) => {
     const start = noteIndex(open);
     return Array.from(
-      { length: NUM_FRETS + 1 },
+      { length: numFrets + 1 },
       (_, i) => CHROMATIC_NOTES[(start + i) % 12],
     );
   });

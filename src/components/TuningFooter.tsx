@@ -1,7 +1,7 @@
-import { useAppContext } from "../context/AppContext";
+import { useSelectedTuning } from "../stores/appStore";
 
 export function TuningFooter() {
-  const { selectedTuning } = useAppContext();
+  const selectedTuning = useSelectedTuning();
   const notesDisplay = [...selectedTuning.notes].reverse().join("");
 
   return (

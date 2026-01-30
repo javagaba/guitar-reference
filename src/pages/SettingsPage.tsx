@@ -21,7 +21,7 @@ export function SettingsPage() {
 
         {/* Instrument */}
         <div className="mt-4">
-          <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-muted">
+          <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-subtle">
             Instrument
           </label>
           <div className="flex gap-2">
@@ -38,7 +38,7 @@ export function SettingsPage() {
                   }`}
                 >
                   {inst.label}
-                  <span className="ml-2 text-xs text-muted">
+                  <span className="ml-2 text-xs text-subtle">
                     {inst.stringCount} strings
                   </span>
                 </button>
@@ -49,7 +49,7 @@ export function SettingsPage() {
 
         {/* Tuning */}
         <div className="mt-6">
-          <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-muted">
+          <label className="mb-2 block text-[11px] font-semibold uppercase tracking-wider text-subtle">
             Tuning
           </label>
           <SelectNative

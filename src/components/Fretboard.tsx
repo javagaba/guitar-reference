@@ -88,7 +88,10 @@ export function Fretboard() {
   return (
     <Card className="mx-auto mt-6 max-w-300">
       <div className="flex items-center justify-between">
-        <SectionTitle>{instrument.label} [{selectedTuning.name}]</SectionTitle>
+        <SectionTitle>
+          {instrument.label}
+          <span className="ml-2 normal-case tracking-normal text-text font-mono">{selectedTuning.name}</span>
+        </SectionTitle>
         {hasScale && (
           <ToggleGroup
             type="single"

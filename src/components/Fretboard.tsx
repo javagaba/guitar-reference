@@ -48,8 +48,6 @@ export function Fretboard() {
     () => buildFretboardForTuning(selectedTuning.notes),
     [selectedTuning],
   );
-  const stringLabels = selectedTuning.notes;
-
   const isStandard = useMemo(
     () => isStandardIntervalTuning(selectedTuning),
     [selectedTuning],
@@ -130,132 +128,184 @@ export function Fretboard() {
         <div className="min-w-200">
           {/* Fret numbers */}
           <div className="mb-2 flex items-center">
-            <div className="w-7 shrink-0" />
-            {fretboard[0].map((_, fret) => (
-              <div
-                key={fret}
-                className={`w-14 text-center font-mono text-[11px] ${
-                  FRET_MARKERS.includes(fret) ? "text-subtle" : "text-[#555]"
-                }`}
-                style={{
-                  borderLeft:
-                    fret === 0
-                      ? "3px solid transparent"
-                      : "1px solid transparent",
-                }}
-              >
-                {fret === 0 ? "Open" : fret}
-              </div>
-            ))}
+            <div className="w-14 shrink-0" />
+            {fretboard[0].slice(1).map((_, i) => {
+              const fret = i + 1;
+              return (
+                <div
+                  key={fret}
+                  className={`w-14 text-center font-mono text-xs ${
+                    FRET_MARKERS.includes(fret) ? "text-subtle" : "text-[#555]"
+                  }`}
+                  style={{ borderLeft: "1px solid transparent" }}
+                >
+                  {fret}
+                </div>
+              );
+            })}
           </div>
 
           {/* Strings */}
-          {fretboard.map((string, stringIndex) => (
-            <div key={stringIndex} className="mb-1 flex items-center">
-              <div className="w-7 font-mono text-xs font-semibold text-muted">
-                {stringIndex === 0 ? stringLabels[0].toLowerCase() : stringLabels[stringIndex]}
+          {fretboard.map((string, stringIndex) => {
+            const openNote = string[0];
+            const openInScale = hasScale && isNoteInScale(openNote, scaleNotes);
+            const openIsRoot = hasScale && noteIndex(openNote) === rootIdx;
+            const openCaged = isInCagedBox(0);
+            const openIsChordTone = chordToneInfo
+              ? getChordToneLabel(openNote, chordToneInfo) !== null
+              : false;
+            const openIsChordRoot = chordToneInfo
+              ? noteIndex(openNote) === chordRootIdx
+              : false;
+            const openChordLabel = chordToneInfo
+              ? getChordToneLabel(openNote, chordToneInfo)
+              : null;
+            const openDimmed = hasScale && (
+              !openInScale ||
+              (chordToneInfo && openInScale && !openIsChordTone) ||
+              (selectedCagedShapes.size > 0 && !openCaged.inBox && openInScale)
+            );
+            const openDegree = hasScale
+              ? getScaleDegree(openNote, scaleNotes)
+              : null;
+            const openLabel = chordToneInfo && openIsChordTone
+              ? openChordLabel ?? undefined
+              : showIntervals && openDegree != null
+                ? openDegree === 1 ? "R" : String(openDegree)
+                : undefined;
+            let openEmphasis: "third" | "fifth" | null = null;
+            if (chordToneInfo && openIsChordTone && !openIsChordRoot) {
+              openEmphasis = "third";
+            } else if (hasScale && openInScale && rootIdx >= 0 && !chordToneInfo) {
+              const semitones = (((noteIndex(openNote) - rootIdx) % 12) + 12) % 12;
+              if (semitones === 3 || semitones === 4) openEmphasis = "third";
+              else if (semitones === 7) openEmphasis = "fifth";
+            }
+
+            return (
+              <div key={stringIndex} className="mb-1 flex items-center">
+                {/* Open note column */}
+                <div
+                  className="flex w-14 shrink-0 items-center justify-center"
+                  style={{ borderRight: "3px solid #555" }}
+                >
+                  <NoteCircle
+                    note={openNote}
+                    size={28}
+                    dimmed={openDimmed}
+                    isRoot={chordToneInfo ? openIsChordRoot : openIsRoot}
+                    label={openLabel}
+                    emphasis={openEmphasis}
+                    colorOverride={
+                      showIntervals && openDegree != null && !chordToneInfo
+                        ? getDegreeColor(openDegree)
+                        : undefined
+                    }
+                    onClick={() =>
+                      playNoteAtMidi(selectedTuning.midiNotes[stringIndex])
+                    }
+                  />
+                </div>
+                {/* Frets 1+ */}
+                {string.slice(1).map((note, i) => {
+                  const fret = i + 1;
+                  const inScale = hasScale && isNoteInScale(note, scaleNotes);
+                  const isRoot = hasScale && noteIndex(note) === rootIdx;
+
+                  const caged = isInCagedBox(fret);
+                  const isChordTone = chordToneInfo
+                    ? getChordToneLabel(note, chordToneInfo) !== null
+                    : false;
+                  const isChordRoot = chordToneInfo
+                    ? noteIndex(note) === chordRootIdx
+                    : false;
+                  const chordLabel = chordToneInfo
+                    ? getChordToneLabel(note, chordToneInfo)
+                    : null;
+
+                  const dimmed = hasScale && (
+                    !inScale ||
+                    (chordToneInfo && inScale && !isChordTone) ||
+                    (selectedCagedShapes.size > 0 && !caged.inBox && inScale)
+                  );
+
+                  const degree = hasScale
+                    ? getScaleDegree(note, scaleNotes)
+                    : null;
+
+                  const label = chordToneInfo && isChordTone
+                    ? chordLabel ?? undefined
+                    : showIntervals && degree != null
+                      ? degree === 1
+                        ? "R"
+                        : String(degree)
+                      : undefined;
+
+                  let emphasis: "third" | "fifth" | null = null;
+                  if (chordToneInfo && isChordTone && !isChordRoot) {
+                    emphasis = "third";
+                  } else if (hasScale && inScale && rootIdx >= 0 && !chordToneInfo) {
+                    const semitones =
+                      (((noteIndex(note) - rootIdx) % 12) + 12) % 12;
+                    if (semitones === 3 || semitones === 4) emphasis = "third";
+                    else if (semitones === 7) emphasis = "fifth";
+                  }
+
+                  return (
+                    <div
+                      key={fret}
+                      className="flex w-14 justify-center py-1"
+                      style={{
+                        borderLeft: "1px solid #333",
+                        backgroundColor: caged.inBox && inScale
+                          ? caged.color!
+                          : FRET_MARKERS.includes(fret)
+                            ? "rgba(255,255,255,0.02)"
+                            : "transparent",
+                      }}
+                    >
+                      <NoteCircle
+                        note={note}
+                        size={28}
+                        dimmed={dimmed}
+                        isRoot={chordToneInfo ? isChordRoot : isRoot}
+                        label={label}
+                        emphasis={emphasis}
+                        colorOverride={
+                          showIntervals && degree != null && !chordToneInfo
+                            ? getDegreeColor(degree)
+                            : undefined
+                        }
+                        onClick={() =>
+                          playNoteAtMidi(selectedTuning.midiNotes[stringIndex] + fret)
+                        }
+                      />
+                    </div>
+                  );
+                })}
               </div>
-              {string.map((note, fret) => {
-                const inScale = hasScale && isNoteInScale(note, scaleNotes);
-                const isRoot = hasScale && noteIndex(note) === rootIdx;
-
-                const caged = isInCagedBox(fret);
-                const isChordTone = chordToneInfo
-                  ? getChordToneLabel(note, chordToneInfo) !== null
-                  : false;
-                const isChordRoot = chordToneInfo
-                  ? noteIndex(note) === chordRootIdx
-                  : false;
-                const chordLabel = chordToneInfo
-                  ? getChordToneLabel(note, chordToneInfo)
-                  : null;
-
-                const dimmed = hasScale && (
-                  !inScale ||
-                  (chordToneInfo && inScale && !isChordTone) ||
-                  (selectedCagedShapes.size > 0 && !caged.inBox && inScale)
-                );
-
-                const degree = hasScale
-                  ? getScaleDegree(note, scaleNotes)
-                  : null;
-
-                // When a chord is selected, show chord-tone labels; otherwise scale degrees
-                const label = chordToneInfo && isChordTone
-                  ? chordLabel ?? undefined
-                  : showIntervals && degree != null
-                    ? degree === 1
-                      ? "R"
-                      : String(degree)
-                    : undefined;
-
-                let emphasis: "third" | "fifth" | null = null;
-                if (chordToneInfo && isChordTone && !isChordRoot) {
-                  emphasis = "third";
-                } else if (hasScale && inScale && rootIdx >= 0 && !chordToneInfo) {
-                  const semitones =
-                    (((noteIndex(note) - rootIdx) % 12) + 12) % 12;
-                  if (semitones === 3 || semitones === 4) emphasis = "third";
-                  else if (semitones === 7) emphasis = "fifth";
-                }
-
-                return (
-                  <div
-                    key={fret}
-                    className="flex w-14 justify-center py-1"
-                    style={{
-                      borderLeft:
-                        fret === 0 ? "3px solid #555" : "1px solid #333",
-                      backgroundColor: caged.inBox && inScale
-                        ? caged.color!
-                        : FRET_MARKERS.includes(fret)
-                          ? "rgba(255,255,255,0.02)"
-                          : "transparent",
-                    }}
-                  >
-                    <NoteCircle
-                      note={note}
-                      size={28}
-                      dimmed={dimmed}
-                      isRoot={chordToneInfo ? isChordRoot : isRoot}
-                      label={label}
-                      emphasis={emphasis}
-                      colorOverride={
-                        showIntervals && degree != null && !chordToneInfo
-                          ? getDegreeColor(degree)
-                          : undefined
-                      }
-                      onClick={() =>
-                        playNoteAtMidi(selectedTuning.midiNotes[stringIndex] + fret)
-                      }
-                    />
-                  </div>
-                );
-              })}
-            </div>
-          ))}
+            );
+          })}
 
           {/* Fret dot markers */}
           <div className="mt-2 flex items-center">
-            <div className="w-7 shrink-0" />
-            {fretboard[0].map((_, fret) => (
-              <div
-                key={fret}
-                className="w-14 text-center text-subtle"
-                style={{
-                  borderLeft:
-                    fret === 0
-                      ? "3px solid transparent"
-                      : "1px solid transparent",
-                }}
-              >
-                {fret === 12 || fret === 24
-                  ? "••"
-                  : FRET_MARKERS.includes(fret)
-                    ? "•"
-                    : ""}
-              </div>
-            ))}
+            <div className="w-14 shrink-0" />
+            {fretboard[0].slice(1).map((_, i) => {
+              const fret = i + 1;
+              return (
+                <div
+                  key={fret}
+                  className="w-14 text-center text-subtle"
+                  style={{ borderLeft: "1px solid transparent" }}
+                >
+                  {fret === 12 || fret === 24
+                    ? "••"
+                    : FRET_MARKERS.includes(fret)
+                      ? "•"
+                      : ""}
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

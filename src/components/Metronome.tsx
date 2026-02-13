@@ -1,9 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { MetronomeEngine, TIME_SIGNATURES, type TimeSignature } from "../metronome";
+import { DRUM_PATTERNS, type DrumPattern } from "../drumPatterns";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { SelectNative } from "@/components/ui/select-native";
 import { Slider } from "@/components/ui/slider";
+import { Switch } from "@/components/ui/switch";
 
 interface MetronomeProps {
   active: boolean;
@@ -18,6 +20,9 @@ export function Metronome({ active: _active, onClose, onBpmChange, onPlayingChan
   const [timeSig, setTimeSig] = useState<TimeSignature>(TIME_SIGNATURES[0]);
   const [playing, setPlaying] = useState(false);
   const [currentBeat, setCurrentBeat] = useState(-1);
+  const [drumsEnabled, setDrumsEnabled] = useState(false);
+  const [drumPattern, setDrumPattern] = useState<DrumPattern>(DRUM_PATTERNS[0]);
+  const [clickEnabled, setClickEnabled] = useState(true);
   const engineRef = useRef<MetronomeEngine | null>(null);
   const tapTimesRef = useRef<number[]>([]);
 
@@ -39,6 +44,24 @@ export function Metronome({ active: _active, onClose, onBpmChange, onPlayingChan
     if (!engine) return;
     engine.timeSig = timeSig;
   }, [timeSig]);
+
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    engine.drumsEnabled = drumsEnabled;
+  }, [drumsEnabled]);
+
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    engine.drumPattern = drumPattern;
+  }, [drumPattern]);
+
+  useEffect(() => {
+    const engine = engineRef.current;
+    if (!engine) return;
+    engine.clickEnabled = clickEnabled;
+  }, [clickEnabled]);
 
   const handleBeat = useCallback((beat: number) => {
     setCurrentBeat(beat);
@@ -139,6 +162,45 @@ export function Metronome({ active: _active, onClose, onBpmChange, onPlayingChan
           </option>
         ))}
       </SelectNative>
+
+      {/* Drums Toggle & Pattern */}
+      <div className="mb-3 space-y-2">
+        <div className="flex items-center justify-between">
+          <span className="text-[11px] text-subtle">Drums</span>
+          <Switch
+            checked={drumsEnabled}
+            onCheckedChange={setDrumsEnabled}
+            aria-label="Enable drums"
+          />
+        </div>
+        {drumsEnabled && (
+          <>
+            <SelectNative
+              value={drumPattern.name}
+              onChange={(e) => {
+                const found = DRUM_PATTERNS.find((p) => p.name === e.target.value);
+                if (found) setDrumPattern(found);
+              }}
+              aria-label="Drum pattern"
+              className="w-full font-mono text-xs"
+            >
+              {DRUM_PATTERNS.map((p) => (
+                <option key={p.name} value={p.name}>
+                  {p.name}
+                </option>
+              ))}
+            </SelectNative>
+            <div className="flex items-center justify-between">
+              <span className="text-[11px] text-subtle">Click</span>
+              <Switch
+                checked={clickEnabled}
+                onCheckedChange={setClickEnabled}
+                aria-label="Enable click"
+              />
+            </div>
+          </>
+        )}
+      </div>
 
       {/* Beat Indicator */}
       <div className="flex justify-center gap-1.5 mb-3">
